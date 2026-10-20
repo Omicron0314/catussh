@@ -1,98 +1,88 @@
 # catussh
 
-[English](./README.md) · **简体中文** · [繁體中文](./README.zh-Hant.md)
+[English](./README.md) · **简体中文**
 
-为管理 Linux 和 macOS 服务器而生的原生 macOS 应用：基于 [Ghostty](https://ghostty.org)
-的 SSH 终端、SFTP 文件传输、实时资源监控，每台服务器三者并排可用。
+为管理 Linux 和 macOS 服务器而生的 SSH 客户端，用 Flutter + Material You 重写：SSH 终端、
+SFTP 文件传输（含文本编辑器）、实时资源监控，每台服务器并排可用。先做 Linux 桌面，
+之后是 Android。
 
 [![License](https://img.shields.io/badge/license-MIT-blue)](./LICENSE)
-![Platform](https://img.shields.io/badge/platform-macOS%2013%2B-lightgrey)
-![Swift](https://img.shields.io/badge/Swift-6.2-orange)
+![Platform](https://img.shields.io/badge/platform-Linux-lightgrey)
+![Flutter](https://img.shields.io/badge/Flutter-3.47-02569B)
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="./Resources/Screenshots/home-dark.jpg">
-  <img alt="catussh 主页：顶部是快速连接，下方是已保存服务器的卡片，每张卡片都有连接、文件和监控按钮。" src="./Resources/Screenshots/home-light.jpg">
+  <source media="(prefers-color-scheme: dark)" srcset="./Resources/Screenshots/home-dark.webp">
+  <img alt="catussh 主页：顶部是快速连接，下方是已保存服务器的卡片。" src="./Resources/Screenshots/home-light.webp">
 </picture>
 
-## 安装
+本仓库 fork 自原生 macOS 应用 [mizorewww/catussh](https://github.com/mizorewww/catussh)，
+重写后可以在 SwiftUI 和 Ghostty 嵌入接口到不了的平台上运行。
+
+## 安装（Linux）
+
+需要 Flutter 3.47+、`clang cmake ninja pkgconf gtk3 libsecret`，以及一个 Secret Service
+密钥环（GNOME Keyring 或 KWallet）。
 
 ```sh
-brew install --cask mizorewww/tap/catussh
+git clone https://github.com/Omicron0314/catussh.git
+cd catussh
+bash Workflow/install-linux.sh        # Release 构建，安装到 ~/.local/opt/catussh
 ```
 
-需要 macOS 13 或更高版本。应用是通用二进制，已签名并经过公证。也可以在
-[Releases](https://github.com/mizorewww/catussh/releases) 下载磁盘映像。
+`bash Workflow/install-linux.sh --uninstall` 卸载。
 
 ## 功能
 
-- **每台服务器都有终端、文件和监控**，各一键打开，工具栏里可以来回切换。
-- **原生 Ghostty 终端**：GPU 渲染，600 多套主题，半透明背景。
-- **可视化终端设置**：直接挑选已安装的字体和真实字重，按键录制快捷键，配色实时预览。
-- **快速连接**：输入 `user@host:port` 后回车。
-- **Linux 和 macOS 服务器监控**：CPU、内存、磁盘、网络和 NVIDIA GPU，使用系统自带工具，无需安装任何 agent。
-- **身份**（密码或密钥）多台服务器共用，**代码片段**可在多台服务器上同时执行，
-  还有**端口转发**和**菜单栏**监控。
-- 另有 iPhone 和 iPad 版，终端和设置与 Mac 相同，需从源码构建。
+- **每台服务器都有终端、文件、编辑器和监控**，各一键打开；会话工具栏可以来回切换，
+  侧栏里每台打开了会话的服务器占一行。
+- **快速连接**：输入 `user@host`、`user@host:2222` 或完整的 `ssh` 命令后回车；
+  会提示最近用过的命令（Ctrl+Enter）。
+- **服务器监控**（Linux 和 macOS）：CPU（含每核）、内存、交换、磁盘、网络和 NVIDIA GPU，
+  无需安装 agent。
+- 多台服务器共用的**身份**（密码或密钥）、可以在多台服务器上同时运行的**片段**、
+  **端口转发**（本地和远程），以及**托盘猫**：每台服务器一只在系统托盘里奔跑的猫，
+  跑得多快取决于 CPU 占用。
+- **校验主机密钥**：首次连接时保存，之后密钥变了就拒绝连接。
+- 服务器、身份和片段加密存储（AES-256-GCM），密钥放在系统密钥环里。
 
 ## 截图
 
-### 服务器列表
+| | |
+|---|---|
+| ![服务器](./Resources/Screenshots/servers-light.webp) | ![监控](./Resources/Screenshots/monitor-dark.webp) |
+| ![终端](./Resources/Screenshots/terminal-dark.webp) | ![文件](./Resources/Screenshots/files-light.webp) |
+| ![身份](./Resources/Screenshots/identities-light.webp) | ![终端设置](./Resources/Screenshots/settings-dark.webp) |
 
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="./Resources/Screenshots/servers-dark.jpg">
-  <img alt="服务器列表按生产、CI 和家庭实验室分组，每一行都有文件、监控和连接按钮。" src="./Resources/Screenshots/servers-light.jpg">
-</picture>
+## 快捷键
 
-### 终端文字设置
+| | |
+|---|---|
+| 新建服务器 | Ctrl+Shift+N |
+| 设置 | Ctrl+, |
+| 显示或隐藏侧栏 | Ctrl+\\ |
+| 在这台服务器上新开终端 / 关闭 | Ctrl+Shift+T / Ctrl+Shift+W |
+| 终端字号 | Ctrl+= / Ctrl+- |
+| 终端复制 / 粘贴 | Ctrl+Shift+C / Ctrl+V |
+| 文件：上一级、前往文件夹、刷新 | Alt+Up、Ctrl+Shift+G、Ctrl+R |
+| 编辑器：保存、打开、关闭文件 | Ctrl+S、Ctrl+O、Ctrl+W |
 
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="./Resources/Screenshots/text-dark.jpg">
-  <img alt="设置中的文字页：字体选择器、样式菜单、带数值输入框的字号滑块，以及笔画加粗。" src="./Resources/Screenshots/text-light.jpg">
-</picture>
-
-### 配色与实时预览
-
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="./Resources/Screenshots/colors-dark.jpg">
-  <img alt="设置中的配色页：上方是实时终端预览，下方是主题库。" src="./Resources/Screenshots/colors-light.jpg">
-</picture>
-
-### 键盘快捷键
-
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="./Resources/Screenshots/keyboard-dark.jpg">
-  <img alt="设置中的键盘页：快捷键以键帽显示，配有直白的动作说明，按用途分组。" src="./Resources/Screenshots/keyboard-light.jpg">
-</picture>
-
-## 使用 catussh
-
-1. **添加服务器**：在主页点 **New Server**（⇧⌘N）。
-2. **连接**：点服务器卡片。**Files** 打开 SFTP，**Monitor** 打开实时用量；工具栏切换器可在三者间切换。
-3. **快速连接**：在主页输入 `user@host`、`user@host:2222` 或完整的 `ssh` 命令。
-4. **设置**（⌘,）包含应用和终端的全部选项。Ghostty 配置项的覆盖情况见
-   [CONFIGURATION.md](Foundation/CatusshTerminal/CONFIGURATION.md)。
-
-## 从源码构建
-
-需要 Xcode 26 或更高版本（Swift 6.2）。
+## 开发
 
 ```sh
-git clone https://github.com/mizorewww/catussh.git
-cd catussh
-bash Workflow/Scripts/install-macos.sh   # Release 构建，并安装到 /Applications
+flutter test                                   # 单元测试（解析器、存储、known hosts……）
+flutter run -d linux
 ```
 
-也可以打开 `App.xcworkspace`，运行 **catussh** scheme（macOS）或 **mCatussh**（iOS 16+）。
-
-## 参与贡献
-
-Bug 和建议请提到 [issues](https://github.com/mizorewww/catussh/issues)。欢迎 Pull
-Request，提交前请先跑终端测试：
+连真实服务器测试（临时起一个用户级 sshd 即可）：
 
 ```sh
-swift test --package-path Foundation/CatusshTerminal
+CATUSSH_TEST_SSHD="127.0.0.1:2222:$USER:/path/to/key" flutter test test/ssh_integration_test.dart
+CATUSSH_SHOTS=/tmp/shots flutter test test/tool/screenshots_test.dart   # 渲染截图
 ```
 
-## 许可证
+`CATUSSH_DATA_DIR=/tmp/profile` 用单独的配置目录运行，密钥存在文件里（不要用于真实数据）；
+`CATUSSH_OPEN=monitor:<服务器名>` 启动时直接打开某台服务器的工具。
 
-[MIT](./LICENSE)。第三方许可证见 [Resources/LICENSE](./Resources/LICENSE)。
+## 许可
+
+MIT。基于 mizorewww 的 catussh，它是 Lakr Aream 的 Rayon 的延续。

@@ -1,103 +1,96 @@
 # catussh
 
-**English** · [简体中文](./README.zh-Hans.md) · [繁體中文](./README.zh-Hant.md)
+**English** · [简体中文](./README.zh-Hans.md)
 
-A native macOS app for the Linux and macOS servers you look after: an SSH terminal
-built on [Ghostty](https://ghostty.org), SFTP file transfer and a live resource
-monitor, side by side for every server.
+An SSH client for the Linux and macOS servers you look after, rebuilt in Flutter with
+Material You: an SSH terminal, SFTP file transfer with a text editor, and a live
+resource monitor, side by side for every server. Linux desktop first; Android next.
 
 [![License](https://img.shields.io/badge/license-MIT-blue)](./LICENSE)
-![Platform](https://img.shields.io/badge/platform-macOS%2013%2B-lightgrey)
-![Swift](https://img.shields.io/badge/Swift-6.2-orange)
+![Platform](https://img.shields.io/badge/platform-Linux-lightgrey)
+![Flutter](https://img.shields.io/badge/Flutter-3.47-02569B)
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="./Resources/Screenshots/home-dark.jpg">
-  <img alt="catussh's Home page: Quick Connect at the top and a grid of saved servers, each with Connect, Files and Monitor buttons." src="./Resources/Screenshots/home-light.jpg">
+  <source media="(prefers-color-scheme: dark)" srcset="./Resources/Screenshots/home-dark.webp">
+  <img alt="catussh's Home page: Quick Connect at the top and a grid of saved servers, each with Connect, Files and Monitor buttons." src="./Resources/Screenshots/home-light.webp">
 </picture>
 
-## Install
+This is a fork of [mizorewww/catussh](https://github.com/mizorewww/catussh), the native
+macOS app, rewritten so it runs where SwiftUI and Ghostty's embedding API do not.
+
+## Install (Linux)
+
+Needs Flutter 3.47+, `clang cmake ninja pkgconf gtk3 libsecret` and a Secret Service
+keyring (GNOME Keyring or KWallet).
 
 ```sh
-brew install --cask mizorewww/tap/catussh
+git clone https://github.com/Omicron0314/catussh.git
+cd catussh
+bash Workflow/install-linux.sh        # release build into ~/.local/opt/catussh
 ```
 
-Requires macOS 13 or later. The app is universal, signed and notarized. You can also
-download the disk image from [Releases](https://github.com/mizorewww/catussh/releases).
+`bash Workflow/install-linux.sh --uninstall` removes it again.
 
 ## Features
 
-- **Terminal, Files and Monitor for every server**, one click each, with a toolbar
-  switcher between them.
-- **A native Ghostty terminal**: GPU rendering, 600+ themes, translucent background.
-- **Visual terminal settings**: installed fonts with their real styles, recorded
-  keyboard shortcuts, a live color preview.
-- **Quick Connect**: type `user@host:port` and press Return.
-- **Server monitor** for Linux and macOS: CPU, memory, disks, network and NVIDIA GPUs,
-  using native system tools with no agent to install.
+- **Terminal, Files, Editor and Monitor for every server**, one click each, with a
+  switcher in every session's toolbar and one sidebar row per server with something open.
+- **Quick Connect**: type `user@host`, `user@host:2222` or a full `ssh` command and press
+  Enter; recent commands are suggested (Ctrl+Enter).
+- **Server monitor** for Linux and macOS: CPU (per core), memory, swap, disks, network and
+  NVIDIA GPUs, with no agent to install.
 - **Identities** (passwords or keys) shared across servers, **snippets** run on many
-  servers at once, **port forwarding**, and a **menu bar** monitor.
-- An iPhone and iPad app with the same terminal and settings, built from source.
+  servers at once, **port forwarding** (local and remote) and **tray cats**: a running cat
+  per server in the system tray whose speed follows its CPU.
+- **Host keys are checked**: a server's key is saved on first connection and a changed
+  key is refused.
+- Servers, identities and snippets are stored encrypted (AES-256-GCM); the key lives in
+  the system keyring.
 
 ## Screenshots
 
-### Servers
+| | |
+|---|---|
+| ![Servers](./Resources/Screenshots/servers-light.webp) | ![Monitor](./Resources/Screenshots/monitor-dark.webp) |
+| ![Terminal](./Resources/Screenshots/terminal-dark.webp) | ![Files](./Resources/Screenshots/files-light.webp) |
+| ![Identities](./Resources/Screenshots/identities-light.webp) | ![Terminal settings](./Resources/Screenshots/settings-dark.webp) |
 
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="./Resources/Screenshots/servers-dark.jpg">
-  <img alt="The Servers table grouped into Production, CI and Home Lab, with Files, Monitor and Connect on each row." src="./Resources/Screenshots/servers-light.jpg">
-</picture>
+## Keyboard
 
-### Terminal text settings
+| | |
+|---|---|
+| New server | Ctrl+Shift+N |
+| Settings | Ctrl+, |
+| Show or hide the sidebar | Ctrl+\\ |
+| New terminal on this server / close it | Ctrl+Shift+T / Ctrl+Shift+W |
+| Terminal text size | Ctrl+= / Ctrl+- |
+| Copy / paste in a terminal | Ctrl+Shift+C / Ctrl+V |
+| Files: up, go to folder, reload | Alt+Up, Ctrl+Shift+G, Ctrl+R |
+| Editor: save, open, close file | Ctrl+S, Ctrl+O, Ctrl+W |
 
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="./Resources/Screenshots/text-dark.jpg">
-  <img alt="Settings, Text: a font picker, style menus, a size slider with a number field, and stroke thickening." src="./Resources/Screenshots/text-light.jpg">
-</picture>
-
-### Colors with live preview
-
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="./Resources/Screenshots/colors-dark.jpg">
-  <img alt="Settings, Colors: a live terminal preview above the theme gallery." src="./Resources/Screenshots/colors-light.jpg">
-</picture>
-
-### Keyboard shortcuts
-
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="./Resources/Screenshots/keyboard-dark.jpg">
-  <img alt="Settings, Keyboard: shortcuts as key caps with plain-language actions, grouped by purpose." src="./Resources/Screenshots/keyboard-light.jpg">
-</picture>
-
-## Using catussh
-
-1. **Add a server**: **New Server** on Home (⇧⌘N).
-2. **Connect**: click a server's tile. **Files** opens SFTP and **Monitor** opens live
-   usage; the toolbar switcher moves between the three.
-3. **Quick Connect**: type `user@host`, `user@host:2222` or a full `ssh` command on Home.
-4. **Settings** (⌘,) cover the app and the terminal. Ghostty coverage is described in
-   [CONFIGURATION.md](Foundation/CatusshTerminal/CONFIGURATION.md).
-
-## Build from source
-
-Needs Xcode 26 or later (Swift 6.2).
+## Development
 
 ```sh
-git clone https://github.com/mizorewww/catussh.git
-cd catussh
-bash Workflow/Scripts/install-macos.sh   # Release build, installed to /Applications
+flutter test                                   # unit tests (parsers, store, known hosts…)
+flutter run -d linux
 ```
 
-Or open `App.xcworkspace` and run the **catussh** scheme (macOS) or **mCatussh** (iOS 16+).
-
-## Contributing
-
-Bugs and ideas go to [issues](https://github.com/mizorewww/catussh/issues). Pull
-requests are welcome; run the terminal tests first:
+Against a real server (a throwaway user-level sshd works):
 
 ```sh
-swift test --package-path Foundation/CatusshTerminal
+CATUSSH_TEST_SSHD="127.0.0.1:2222:$USER:/path/to/key" flutter test test/ssh_integration_test.dart
+CATUSSH_SHOTS=/tmp/shots flutter test test/tool/screenshots_test.dart   # renders the screenshots
 ```
+
+`CATUSSH_DATA_DIR=/tmp/profile` runs the app on a separate profile whose key is kept in a
+file (never use it for real data); `CATUSSH_OPEN=monitor:<server name>` opens a server's
+tool at launch.
+
+Layout: `lib/core` (models, store, vault, known hosts, `ssh` command parser),
+`lib/ssh` (connecting and signing in), `lib/monitor` (the monitor script and parsers),
+`lib/sessions` (terminal, SFTP, editor, monitor, port forward, batch run),
+`lib/app/router.dart` (navigation and open sessions), `lib/features/*` (the pages).
 
 ## License
 
-[MIT](./LICENSE). Third-party licenses are listed in [Resources/LICENSE](./Resources/LICENSE).
+MIT. Based on catussh by mizorewww, the continuation of Rayon by Lakr Aream.
