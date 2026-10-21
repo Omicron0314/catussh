@@ -6,13 +6,14 @@ import 'package:flutter/material.dart';
 import '../../app/router.dart';
 import '../../core/models.dart';
 import '../../core/store.dart';
+import '../../core/strings.dart';
 import '../../ui/widgets.dart';
 import '../menubar/tray.dart';
 import 'server_editor.dart';
 
 class ServerActions {
   static Future<void> duplicate(BuildContext context, Machine machine) async {
-    final ok = await requiresConfirmation(context, message: 'Duplicate ${machine.name}?', confirmTitle: 'Duplicate');
+    final ok = await requiresConfirmation(context, message: S.l.duplicateServer(machine.name), confirmTitle: S.l.duplicate);
     if (!ok) return;
     final copy = machine.copy()
       ..id = newId()
@@ -24,9 +25,9 @@ class ServerActions {
     if (machines.isEmpty) return;
     final ok = await requiresConfirmation(
       context,
-      message: machines.length == 1 ? 'Delete ${machines.first.name}?' : 'Delete ${machines.length} servers?',
-      informative: 'Port forwards through it stop working.',
-      confirmTitle: 'Delete',
+      message: machines.length == 1 ? S.l.deleteServer(machines.first.name) : S.l.deleteServers(machines.length),
+      informative: S.l.portForwardsStop,
+      confirmTitle: S.l.delete,
       destructive: true,
     );
     if (!ok) return;
@@ -41,10 +42,9 @@ class ServerActions {
   static Future<void> forgetHostKey(BuildContext context, Machine machine) async {
     final ok = await requiresConfirmation(
       context,
-      message: 'Forget the host key of ${machine.name}?',
-      informative:
-          'The key the server presents on the next connection is saved as its key. Do this only when you know its keys were replaced.',
-      confirmTitle: 'Forget',
+      message: S.l.forgetHostKeyOf(machine.name),
+      informative: S.l.forgetHostKeyExplain,
+      confirmTitle: S.l.forget,
     );
     if (!ok) return;
     CatusshStore.shared.knownHosts.forget(machine.remoteAddress, machine.port);
@@ -58,24 +58,24 @@ Future<void> showServerMenu(BuildContext context, Machine machine, Offset positi
   final store = CatusshStore.shared;
   return runMenu(context, position, [
     if (includesTools) ...[
-      menuItem('Open Terminal', ServerTool.terminal.icon, () => router.show(ServerTool.terminal, machine)),
-      menuItem('Open Files', ServerTool.files.icon, () => router.show(ServerTool.files, machine)),
-      menuItem('Open Editor', ServerTool.editor.icon, () => router.show(ServerTool.editor, machine)),
-      menuItem('Open Monitor', ServerTool.monitor.icon, () => router.show(ServerTool.monitor, machine)),
+      menuItem(S.l.openTerminal, ServerTool.terminal.icon, () => router.show(ServerTool.terminal, machine)),
+      menuItem(S.l.openFiles, ServerTool.files.icon, () => router.show(ServerTool.files, machine)),
+      menuItem(S.l.openEditor, ServerTool.editor.icon, () => router.show(ServerTool.editor, machine)),
+      menuItem(S.l.openMonitor, ServerTool.monitor.icon, () => router.show(ServerTool.monitor, machine)),
     ],
-    menuItem('New Terminal', Icons.add_box_outlined, () => router.openTerminal(machine)),
-    menuItem('Show in Tray', Icons.pets, () => TrayController.instance.show(machine),
+    menuItem(S.l.newTerminal, Icons.add_box_outlined, () => router.openTerminal(machine)),
+    menuItem(S.l.showInTray, Icons.pets, () => TrayController.instance.show(machine),
         enabled: TrayController.instance.available),
     const PopupMenuDivider(),
-    menuItem('Edit…', Icons.edit_outlined, () => showServerEditor(context, machine: machine)),
-    menuItem('Duplicate', Icons.copy_all_outlined, () => ServerActions.duplicate(context, machine)),
-    menuItem('Copy Address', Icons.content_copy,
-        () => copyToClipboard(context, '${machine.remoteAddress}:${machine.remotePort}', what: 'Address')),
-    menuItem('Copy SSH Command', Icons.code,
-        () => copyToClipboard(context, machine.getCommand(store.usernameFor(machine)), what: 'Command')),
-    menuItem('Forget Host Key…', Icons.key_off_outlined, () => ServerActions.forgetHostKey(context, machine)),
+    menuItem(S.l.edit, Icons.edit_outlined, () => showServerEditor(context, machine: machine)),
+    menuItem(S.l.duplicate, Icons.copy_all_outlined, () => ServerActions.duplicate(context, machine)),
+    menuItem(S.l.copyAddress, Icons.content_copy,
+        () => copyToClipboard(context, '${machine.remoteAddress}:${machine.remotePort}', what: S.l.fieldAddress)),
+    menuItem(S.l.copyCommand, Icons.code,
+        () => copyToClipboard(context, machine.getCommand(store.usernameFor(machine)), what: S.l.command)),
+    menuItem(S.l.forgetHostKey, Icons.key_off_outlined, () => ServerActions.forgetHostKey(context, machine)),
     const PopupMenuDivider(),
-    menuItem('Delete…', Icons.delete_outline, () => ServerActions.delete(context, [machine]),
+    menuItem(S.l.deleteEllipsis, Icons.delete_outline, () => ServerActions.delete(context, [machine]),
         destructive: true, context: context),
   ]);
 }

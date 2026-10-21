@@ -1,5 +1,7 @@
 // Display formatting, ported from RXFormat.
 
+import 'strings.dart';
+
 class RXFormat {
   static String percent(double value) =>
       value.isFinite ? value.round().toString() : '0';
@@ -42,45 +44,31 @@ class RXFormat {
     final days = total ~/ (24 * 60);
     final hours = (total ~/ 60) % 24;
     final minutes = total % 60;
-    final parts = <String>[
-      if (days > 0) '${days}d',
-      if (hours > 0) '${hours}h',
-      if (minutes > 0 || (days == 0 && hours == 0)) '${minutes}m',
-    ];
-    return parts.take(2).join(' ');
+    if (days > 0) return S.l.durationDaysHours(days, hours);
+    if (hours > 0) return S.l.durationHoursMinutes(hours, minutes);
+    return S.l.durationMinutes(minutes);
   }
 
-  /// "Never", "Now", "5 minutes ago", "3 days ago".
+  /// "Never", "Now", "5 minutes ago", "3 days ago"; localized.
   static String relative(DateTime date, {DateTime? now}) {
     now ??= DateTime.now();
-    if (date.millisecondsSinceEpoch < 86400 * 365 * 1000) return 'Never';
+    if (date.millisecondsSinceEpoch < 86400 * 365 * 1000) return S.l.never;
     final diff = now.difference(date);
     final seconds = diff.inSeconds.abs();
-    if (seconds < 60) return 'Now';
-    String unit(int n, String name) => '$n $name${n == 1 ? '' : 's'}';
-    final String amount;
+    if (seconds < 60) return S.l.now;
+    final future = diff.isNegative;
     if (seconds < 3600) {
-      amount = unit(seconds ~/ 60, 'minute');
+      final n = seconds ~/ 60;
+      return future ? S.l.inMinutes(n) : S.l.minutesAgo(n);
     } else if (seconds < 86400) {
-      amount = unit(seconds ~/ 3600, 'hour');
-    } else if (seconds < 86400 * 7) {
-      final days = seconds ~/ 86400;
-      if (days == 1) return diff.isNegative ? 'tomorrow' : 'yesterday';
-      amount = unit(days, 'day');
-    } else if (seconds < 86400 * 30) {
-      final weeks = seconds ~/ (86400 * 7);
-      if (weeks == 1) return diff.isNegative ? 'next week' : 'last week';
-      amount = unit(weeks, 'week');
+      final n = seconds ~/ 3600;
+      return future ? S.l.inHours(n) : S.l.hoursAgo(n);
     } else if (seconds < 86400 * 365) {
-      final months = seconds ~/ (86400 * 30);
-      if (months == 1) return diff.isNegative ? 'next month' : 'last month';
-      amount = unit(months, 'month');
-    } else {
-      final years = seconds ~/ (86400 * 365);
-      if (years == 1) return diff.isNegative ? 'next year' : 'last year';
-      amount = unit(years, 'year');
+      final n = seconds ~/ 86400;
+      return future ? S.l.inDays(n) : S.l.daysAgo(n);
     }
-    return diff.isNegative ? 'in $amount' : '$amount ago';
+    final n = seconds ~/ (86400 * 365);
+    return future ? S.l.inDays(n * 365) : S.l.yearsAgo(n);
   }
 
   /// File sizes in the Files table: binary units, like Finder's "1.2 MB".

@@ -51,6 +51,8 @@ class CatusshStore extends ChangeNotifier {
   Color seedColor = const Color(0xFF4B49C8);
   int terminalFontSize = 14;
   String terminalFontFamily = 'monospace';
+  /// 'system', 'en' or 'zh'.
+  String locale = 'system';
   String terminalTheme = 'catussh';
 
   Future<void> _read() async {
@@ -84,6 +86,7 @@ class CatusshStore extends ChangeNotifier {
     seedColor = Color(read('seedColor', 0xFF4B49C8));
     terminalFontSize = read('terminalFontSize', 14);
     terminalFontFamily = read('terminalFontFamily', 'monospace');
+    locale = read('locale', 'system');
     terminalTheme = read('terminalTheme', 'catussh');
   }
 
@@ -102,6 +105,7 @@ class CatusshStore extends ChangeNotifier {
         'seedColor': seedColor.toARGB32(),
         'terminalFontSize': terminalFontSize,
         'terminalFontFamily': terminalFontFamily,
+        'locale': locale,
         'terminalTheme': terminalTheme,
       };
 

@@ -11,6 +11,7 @@ import '../../app/router.dart';
 import '../../core/format.dart';
 import '../../core/models.dart';
 import '../../core/store.dart';
+import '../../core/strings.dart';
 import '../../sessions/file_transfer_session.dart';
 import '../../ui/theme.dart';
 import '../../ui/widgets.dart';
@@ -55,13 +56,13 @@ class _FileTransferPageState extends State<FileTransferPage> {
   void _edit(RemoteFile file) => AppRouter.shared.openEditorFor(s, path: file.path);
 
   Future<void> _download(RemoteFile file) async {
-    final directory = await getDirectoryPath(confirmButtonText: 'Download Here');
+    final directory = await getDirectoryPath(confirmButtonText: S.l.downloadHere);
     if (directory == null) return;
     await _report(s.download(file, directory));
   }
 
   Future<void> _upload() async {
-    final files = await openFiles(confirmButtonText: 'Upload');
+    final files = await openFiles(confirmButtonText: S.l.upload);
     if (files.isEmpty) return;
     await _report(s.upload(files.map((f) => f.path).toList()));
   }
@@ -69,11 +70,9 @@ class _FileTransferPageState extends State<FileTransferPage> {
   Future<void> _delete(RemoteFile file) async {
     final ok = await requiresConfirmation(
       context,
-      message: 'Delete ${file.name}?',
-      informative: file.isDirectory
-          ? 'The folder and everything in it is deleted from the server. This cannot be undone.'
-          : 'The file is deleted from the server. This cannot be undone.',
-      confirmTitle: 'Delete',
+      message: S.l.deleteFile(file.name),
+      informative: file.isDirectory ? S.l.deleteFolderWarning : S.l.deleteFileWarning,
+      confirmTitle: S.l.delete,
       destructive: true,
       always: true,
     );
@@ -81,29 +80,30 @@ class _FileTransferPageState extends State<FileTransferPage> {
   }
 
   static String? _validName(String name) {
-    if (name.isEmpty) return 'A name is required.';
-    if (name.contains('/') || name == '.' || name == '..') return 'That name contains characters a file name cannot have.';
+    if (name.isEmpty) return S.l.nameRequired;
+    if (name.contains('/') || name == '.' || name == '..') return S.l.invalidName;
     return null;
   }
 
   Future<void> _rename(RemoteFile file) async {
-    final name = await promptText(context, title: 'Rename', initial: file.name, confirmTitle: 'Rename', validate: _validName);
+    final name = await promptText(context, title: S.l.rename, initial: file.name, confirmTitle: S.l.rename, validate: _validName);
     if (name != null && name != file.name) await _report(s.rename(file, name));
   }
 
   Future<void> _newFolder() async {
-    final name = await promptText(context, title: 'New Folder', hint: 'untitled folder', confirmTitle: 'Create', validate: _validName);
+    final name = await promptText(context,
+        title: S.l.newFolder, hint: S.l.untitledFolder, confirmTitle: S.l.create, validate: _validName);
     if (name != null) await _report(s.createFolder(name));
   }
 
   Future<void> _goTo() async {
     final path = await promptText(
       context,
-      title: 'Go to Folder',
+      title: S.l.goToFolder,
       initial: s.currentDir,
-      confirmTitle: 'Go',
+      confirmTitle: S.l.goAction,
       monospace: true,
-      validate: (v) => v.startsWith('/') || v.startsWith('~') ? null : 'Use an absolute path starting with /.',
+      validate: (v) => v.startsWith('/') || v.startsWith('~') ? null : S.l.absolutePathRequired,
     );
     if (path != null) await s.navigate(path.startsWith('~') ? path.replaceFirst('~', '.') : path);
   }
@@ -115,11 +115,9 @@ class _FileTransferPageState extends State<FileTransferPage> {
     if (unsaved || s.currentProgress != null) {
       final ok = await requiresConfirmation(
         context,
-        message: 'Close the file transfer on ${s.machine.name}?',
-        informative: unsaved
-            ? 'Files open in the editor have changes that are not saved. They are lost if you close.'
-            : 'A transfer is still running and will be interrupted.',
-        confirmTitle: unsaved ? 'Discard Changes' : 'Close',
+        message: S.l.closeTransfer(s.machine.name),
+        informative: unsaved ? S.l.unsavedFilesWarning : S.l.transferRunningWarning,
+        confirmTitle: unsaved ? S.l.discardChanges : S.l.close,
         destructive: true,
         always: unsaved,
       );
@@ -132,15 +130,15 @@ class _FileTransferPageState extends State<FileTransferPage> {
     setState(() => _selection = file.name);
     runMenu(context, position, [
       file.isDirectory
-          ? menuItem('Open', Icons.folder_open_outlined, () => _open(file))
-          : menuItem('Edit', Icons.edit_note, () => _edit(file)),
-      menuItem('Download…', Icons.download, () => _download(file)),
+          ? menuItem(S.l.openAction, Icons.folder_open_outlined, () => _open(file))
+          : menuItem(S.l.editAction, Icons.edit_note, () => _edit(file)),
+      menuItem(S.l.downloadEllipsis, Icons.download, () => _download(file)),
       const PopupMenuDivider(),
-      menuItem('Rename…', Icons.drive_file_rename_outline, () => _rename(file)),
-      menuItem('Copy Name', Icons.content_copy, () => copyToClipboard(context, file.name, what: 'Name')),
-      menuItem('Copy Path', Icons.link, () => copyToClipboard(context, file.path, what: 'Path')),
+      menuItem(S.l.renameEllipsis, Icons.drive_file_rename_outline, () => _rename(file)),
+      menuItem(S.l.copyName, Icons.content_copy, () => copyToClipboard(context, file.name, what: S.l.fieldName)),
+      menuItem(S.l.copyPath, Icons.link, () => copyToClipboard(context, file.path, what: S.l.pathLabel)),
       const PopupMenuDivider(),
-      menuItem('Delete…', Icons.delete_outline, () => _delete(file), destructive: true, context: context),
+      menuItem(S.l.deleteEllipsis, Icons.delete_outline, () => _delete(file), destructive: true, context: context),
     ]);
   }
 
@@ -163,10 +161,10 @@ class _FileTransferPageState extends State<FileTransferPage> {
         Widget content;
         if (s.connectionPhase == ConnectionPhase.closed) {
           content = RXCard(
-            child: EmptyStateView('Connection closed',
+            child: EmptyStateView(S.l.connectionClosed,
                 icon: Icons.power_off_outlined,
-                message: s.currentHint == 'Connection Closed' ? null : s.currentHint,
-                actionTitle: 'Reconnect',
+                message: s.currentHint == S.l.connectionClosed ? null : s.currentHint,
+                actionTitle: S.l.reconnect,
                 action: s.reconnect),
           );
         } else if (s.connectionPhase != ConnectionPhase.connected && s.currentFileList.isEmpty) {
@@ -176,7 +174,7 @@ class _FileTransferPageState extends State<FileTransferPage> {
               child: Column(children: [
                 const CircularProgressIndicator(),
                 const SizedBox(height: RX.s3),
-                Text(s.currentHint.isEmpty ? 'Connecting…' : s.currentHint, textAlign: TextAlign.center),
+                Text(s.currentHint.isEmpty ? S.l.connecting : s.currentHint, textAlign: TextAlign.center),
               ]),
             ),
           );
@@ -189,31 +187,31 @@ class _FileTransferPageState extends State<FileTransferPage> {
           center: saved == null ? null : ServerToolSwitcher(machine: saved, current: ServerTool.files),
           leading: Row(children: [
             IconButton(
-              tooltip: 'Enclosing Folder (Alt+Up)',
+              tooltip: S.l.enclosingFolder,
               onPressed: enabled && s.currentDir != '/' ? s.goUp : null,
               icon: const Icon(Icons.arrow_upward),
             ),
             IconButton(
-              tooltip: 'Go to Folder (Ctrl+Shift+G)',
+              tooltip: S.l.goToFolderShortcut,
               onPressed: enabled ? _goTo : null,
               icon: const Icon(Icons.subdirectory_arrow_right),
             ),
           ]),
           actions: [
-            IconButton(tooltip: 'Reload (Ctrl+R)', onPressed: enabled ? s.loadCurrentFileList : null, icon: const Icon(Icons.refresh)),
-            IconButton(tooltip: 'New Folder', onPressed: enabled ? _newFolder : null, icon: const Icon(Icons.create_new_folder_outlined)),
-            IconButton(tooltip: 'Upload', onPressed: enabled ? _upload : null, icon: const Icon(Icons.upload_file)),
+            IconButton(tooltip: S.l.reloadShortcut, onPressed: enabled ? s.loadCurrentFileList : null, icon: const Icon(Icons.refresh)),
+            IconButton(tooltip: S.l.newFolder, onPressed: enabled ? _newFolder : null, icon: const Icon(Icons.create_new_folder_outlined)),
+            IconButton(tooltip: S.l.upload, onPressed: enabled ? _upload : null, icon: const Icon(Icons.upload_file)),
             FilledButton.icon(
               onPressed: enabled && _selected != null ? () => _download(_selected!) : null,
               icon: const Icon(Icons.download),
-              label: const Text('Download'),
+              label: Text(S.l.download),
             ),
-            IconButton(tooltip: 'Close', onPressed: _close, icon: const Icon(Icons.close)),
+            IconButton(tooltip: S.l.close, onPressed: _close, icon: const Icon(Icons.close)),
           ],
           body: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Text(store.machineRedacted == RedactedLevel.all ? 'File Transfer' : s.machine.name,
+              Text(store.machineRedacted == RedactedLevel.all ? S.l.fileTransfer : s.machine.name,
                   style: theme.textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.w600)),
               if (store.machineRedacted == RedactedLevel.none)
                 Text(s.machine.getCommand(store.usernameFor(s.machine), insertLeadingSSH: false),
@@ -222,7 +220,7 @@ class _FileTransferPageState extends State<FileTransferPage> {
               Row(children: [
                 Expanded(child: _Breadcrumb(path: s.currentDir, onTap: enabled ? s.navigate : null)),
                 const SizedBox(width: RX.s3),
-                SizedBox(width: 220, child: SearchField(controller: _filter, hint: 'Filter this folder')),
+                SizedBox(width: 220, child: SearchField(controller: _filter, hint: S.l.filterThisFolder)),
               ]),
               const SizedBox(height: RX.s3),
               content,
@@ -266,7 +264,7 @@ class _FileTransferPageState extends State<FileTransferPage> {
                       child: Row(mainAxisSize: MainAxisSize.min, children: [
                         Icon(Icons.upload_file, color: scheme.primary),
                         const SizedBox(width: RX.s2),
-                        Text('Drop to upload to ${s.currentDir}',
+                        Text(S.l.dropToUpload(s.currentDir),
                             style: theme.textTheme.titleMedium?.copyWith(color: scheme.primary)),
                       ]),
                     ),
@@ -294,24 +292,24 @@ class _FileTransferPageState extends State<FileTransferPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const SizedBox(
+              SizedBox(
                 height: 36,
                 child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: RX.s3),
+                  padding: const EdgeInsets.symmetric(horizontal: RX.s3),
                   child: Row(children: [
-                    Expanded(child: CapsLabel('Name')),
-                    SizedBox(width: 90, child: Align(alignment: Alignment.centerRight, child: CapsLabel('Size'))),
+                    Expanded(child: CapsLabel(S.l.fieldName)),
+                    SizedBox(width: 90, child: Align(alignment: Alignment.centerRight, child: CapsLabel(S.l.fileSize))),
                     SizedBox(width: 24),
-                    SizedBox(width: 140, child: CapsLabel('Modified')),
-                    SizedBox(width: 110, child: CapsLabel('Permissions')),
-                    SizedBox(width: 90, child: CapsLabel('Owner')),
+                    SizedBox(width: 140, child: CapsLabel(S.l.modified)),
+                    SizedBox(width: 110, child: CapsLabel(S.l.permissions)),
+                    SizedBox(width: 90, child: CapsLabel(S.l.owner)),
                   ]),
                 ),
               ),
               const Divider(),
               Expanded(
                 child: files.isEmpty
-                    ? EmptyStateView(needle.isEmpty ? 'Empty folder' : 'No matches', icon: Icons.folder_outlined)
+                    ? EmptyStateView(needle.isEmpty ? S.l.emptyFolder : S.l.noMatches, icon: Icons.folder_outlined)
                     : ListView.builder(
                         itemCount: files.length,
                         itemExtent: 36,
@@ -412,7 +410,7 @@ class _TransferCard extends StatelessWidget {
         const SizedBox(width: RX.s3),
         Expanded(
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text('Transfer', style: theme.textTheme.titleSmall),
+            Text(S.l.transfer, style: theme.textTheme.titleSmall),
             const SizedBox(height: 2),
             Text(name, maxLines: 1, overflow: TextOverflow.ellipsis),
             const SizedBox(height: 6),

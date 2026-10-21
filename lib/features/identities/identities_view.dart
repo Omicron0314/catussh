@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 
 import '../../core/models.dart';
 import '../../core/store.dart';
+import '../../core/strings.dart';
 import '../../ui/theme.dart';
 import '../../ui/widgets.dart';
 import 'identity_form.dart';
@@ -59,9 +60,9 @@ class _IdentitiesViewState extends State<IdentitiesView> {
     final selected = store.identity(_selection);
 
     return PageScaffold(
-      title: 'Identities',
+      title: S.l.identitiesTitle,
       search: _search,
-      searchHint: 'Search identities',
+      searchHint: S.l.searchIdentities,
       actions: [
         FilledButton.icon(
           onPressed: () async {
@@ -69,16 +70,16 @@ class _IdentitiesViewState extends State<IdentitiesView> {
             if (created != null) setState(() => _selection = created);
           },
           icon: const Icon(Icons.add),
-          label: const Text('New Identity'),
+          label: Text(S.l.newIdentity),
         ),
       ],
       body: store.identities.isEmpty
           ? RXCard(
               child: EmptyStateView(
-                'No identities yet',
+                S.l.noIdentitiesYet,
                 icon: Icons.person_outline,
-                message: 'A username with a password or key.',
-                actionTitle: 'New Identity',
+                message: S.l.identityEmptyMessage,
+                actionTitle: S.l.newIdentity,
                 action: () async {
                   final created = await showIdentityEditor(context);
                   if (created != null) setState(() => _selection = created);
@@ -95,11 +96,11 @@ class _IdentitiesViewState extends State<IdentitiesView> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        if (filtered.isEmpty) const EmptyStateView('No matches', icon: Icons.search),
+                        if (filtered.isEmpty) EmptyStateView(S.l.noMatches, icon: Icons.search),
                         for (final (name, items) in groups) ...[
                           Padding(
                             padding: const EdgeInsets.fromLTRB(RX.s3, RX.s3, RX.s3, RX.s1),
-                            child: Text(name.isEmpty ? 'Default' : name,
+                            child: Text(name.isEmpty ? S.l.defaultGroup : name,
                                 style: Theme.of(context).textTheme.labelMedium?.copyWith(
                                     color: Theme.of(context).colorScheme.onSurfaceVariant, fontWeight: FontWeight.w600)),
                           ),
@@ -117,7 +118,7 @@ class _IdentitiesViewState extends State<IdentitiesView> {
                 const SizedBox(width: RX.s4),
                 Expanded(
                   child: selected == null
-                      ? const RXCard(child: EmptyStateView('Select an identity', icon: Icons.person_outline))
+                      ? RXCard(child: EmptyStateView(S.l.selectIdentity, icon: Icons.person_outline))
                       : _IdentityDetail(key: ValueKey(selected.id), identity: selected),
                 ),
               ],
@@ -140,11 +141,9 @@ class IdentityActions {
     final users = store.machines.where((m) => m.associatedIdentity == identity.id).length;
     final ok = await requiresConfirmation(
       context,
-      message: 'Delete identity ${identity.username}?',
-      informative: users > 0
-          ? '$users server${users == 1 ? '' : 's'} use it and will try automatic identities instead.'
-          : 'Its password and keys are removed from catussh.',
-      confirmTitle: 'Delete',
+      message: S.l.deleteIdentity(identity.username),
+      informative: users > 0 ? S.l.identityInUse(users) : S.l.identityRemoved,
+      confirmTitle: S.l.delete,
       destructive: true,
     );
     if (ok) store.deleteIdentity(identity.id);
@@ -165,11 +164,11 @@ class _IdentityRow extends StatelessWidget {
     final usage = store.machines.where((m) => m.associatedIdentity == identity.id).length;
     return GestureDetector(
       onSecondaryTapUp: (d) => runMenu(context, d.globalPosition, [
-        menuItem('Duplicate', Icons.copy_all_outlined, () => IdentityActions.duplicate(identity)),
-        menuItem('Copy Public Key', Icons.content_copy, () => copyToClipboard(context, identity.publicKey, what: 'Public key'),
+        menuItem(S.l.duplicate, Icons.copy_all_outlined, () => IdentityActions.duplicate(identity)),
+        menuItem(S.l.copyPublicKey, Icons.content_copy, () => copyToClipboard(context, identity.publicKey, what: S.l.publicKey),
             enabled: identity.publicKey.isNotEmpty),
         const PopupMenuDivider(),
-        menuItem('Delete…', Icons.delete_outline, () => IdentityActions.delete(context, identity),
+        menuItem(S.l.deleteEllipsis, Icons.delete_outline, () => IdentityActions.delete(context, identity),
             destructive: true, context: context),
       ]),
       child: ListTile(
@@ -183,9 +182,9 @@ class _IdentityRow extends StatelessWidget {
           backgroundColor: scheme.primaryContainer,
           child: Icon(identity.privateKey.isNotEmpty ? Icons.key : Icons.password, size: 16, color: scheme.onPrimaryContainer),
         ),
-        title: Text(identity.username.isEmpty ? 'No username' : identity.username),
+        title: Text(identity.username.isEmpty ? S.l.noUsername : identity.username),
         subtitle: Text(identity.authDescription),
-        trailing: Text('$usage server${usage == 1 ? '' : 's'}', style: theme.textTheme.labelMedium),
+        trailing: Text(S.l.serversUsingCount(usage), style: theme.textTheme.labelMedium),
       ),
     );
   }
@@ -226,8 +225,10 @@ class _IdentityDetailState extends State<_IdentityDetail> {
     final original = store.identity(widget.identity.id) ?? widget.identity;
     final usedBy = store.machines.where((m) => m.associatedIdentity == original.id).map((m) => m.name).toList();
     final usage = usedBy.isEmpty
-        ? 'Not used by any server'
-        : 'Used by ${usedBy.take(4).join(', ')}${usedBy.length > 4 ? ' and ${usedBy.length - 4} more' : ''}';
+        ? S.l.notUsedByAnyServer
+        : (usedBy.length > 4
+            ? S.l.usedByMore(usedBy.take(4).join(', '), usedBy.length - 4)
+            : S.l.usedBy(usedBy.join(', ')));
     final dirty = _draft.differsFrom(original);
 
     return CallbackShortcuts(
@@ -245,14 +246,14 @@ class _IdentityDetailState extends State<_IdentityDetail> {
                 ),
                 Builder(
                   builder: (context) => IconButton(
-                    tooltip: 'More',
+                    tooltip: S.l.more,
                     icon: const Icon(Icons.more_horiz),
                     onPressed: () {
                       final box = context.findRenderObject() as RenderBox;
                       runMenu(context, box.localToGlobal(box.size.bottomLeft(Offset.zero)), [
-                        menuItem('Duplicate', Icons.copy_all_outlined, () => IdentityActions.duplicate(original)),
+                        menuItem(S.l.duplicate, Icons.copy_all_outlined, () => IdentityActions.duplicate(original)),
                         const PopupMenuDivider(),
-                        menuItem('Delete…', Icons.delete_outline, () => IdentityActions.delete(context, original),
+                        menuItem(S.l.deleteEllipsis, Icons.delete_outline, () => IdentityActions.delete(context, original),
                             destructive: true, context: context),
                       ]);
                     },
@@ -268,12 +269,12 @@ class _IdentityDetailState extends State<_IdentityDetail> {
               children: [
                 TextButton(
                   onPressed: dirty ? () => setState(() => _draft = IdentityDraft.from(original)) : null,
-                  child: const Text('Revert'),
+                  child: Text(S.l.revert),
                 ),
                 const SizedBox(width: RX.s2),
                 Tooltip(
-                  message: 'Save (Ctrl+S)',
-                  child: FilledButton(onPressed: dirty && _draft.isValid ? _save : null, child: const Text('Save')),
+                  message: S.l.saveShortcut,
+                  child: FilledButton(onPressed: dirty && _draft.isValid ? _save : null, child: Text(S.l.save)),
                 ),
               ],
             ),
@@ -302,9 +303,9 @@ class _IdentityEditorState extends State<_IdentityEditor> {
   @override
   Widget build(BuildContext context) {
     return SheetDialog(
-      title: 'New Identity',
+      title: S.l.newIdentity,
       actions: [
-        TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+        TextButton(onPressed: () => Navigator.pop(context), child: Text(S.l.cancel)),
         FilledButton(
           onPressed: !_draft.isValid
               ? null
@@ -313,7 +314,7 @@ class _IdentityEditorState extends State<_IdentityEditor> {
                   CatusshStore.shared.putIdentity(identity);
                   Navigator.pop(context, identity.id);
                 },
-          child: const Text('Create'),
+          child: Text(S.l.create),
         ),
       ],
       child: IdentityForm(draft: _draft, onChanged: () => setState(() {})),

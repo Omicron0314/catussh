@@ -6,16 +6,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../../core/store.dart';
+import '../../core/strings.dart';
 import '../../ui/theme.dart';
 import '../../ui/widgets.dart';
 
 enum AboutDocument {
-  license('assets/LICENSE', 'License'),
-  agreement('assets/EULA', 'End User License Agreement');
+  license('assets/LICENSE'),
+  agreement('assets/EULA');
 
-  const AboutDocument(this.asset, this.title);
+  const AboutDocument(this.asset);
   final String asset;
-  final String title;
+
+  String get title => this == AboutDocument.license ? S.l.license : S.l.eula;
 }
 
 Widget _documentBox(BuildContext context, AboutDocument document, double height) {
@@ -27,7 +29,7 @@ Widget _documentBox(BuildContext context, AboutDocument document, double height)
       borderRadius: BorderRadius.circular(12),
     ),
     child: FutureBuilder<String>(
-      future: rootBundle.loadString(document.asset).catchError((_) => 'The text could not be loaded.'),
+      future: rootBundle.loadString(document.asset).catchError((_) => S.l.textNotLoaded),
       builder: (context, snapshot) => SingleChildScrollView(
         padding: const EdgeInsets.all(RX.s4),
         child: SelectableText(
@@ -45,7 +47,7 @@ Future<void> showDocument(BuildContext context, AboutDocument document) {
     builder: (context) => SheetDialog(
       title: document.title,
       width: 640,
-      actions: [FilledButton(onPressed: () => Navigator.pop(context), child: const Text('Done'))],
+      actions: [FilledButton(onPressed: () => Navigator.pop(context), child: Text(S.l.done))],
       child: _documentBox(context, document, 360),
     ),
   );
@@ -74,10 +76,10 @@ class _AgreementSheetState extends State<_AgreementSheet> {
     return PopScope(
       canPop: false,
       child: SheetDialog(
-        title: 'Welcome to catussh',
+        title: S.l.welcome,
         width: 600,
         leadingActions: [
-          TextButton(onPressed: () => exit(0), child: const Text('Quit')),
+          TextButton(onPressed: () => exit(0), child: Text(S.l.quit)),
         ],
         actions: [
           FilledButton(
@@ -87,7 +89,7 @@ class _AgreementSheetState extends State<_AgreementSheet> {
                     Navigator.pop(context);
                   }
                 : null,
-            child: const Text('Continue'),
+            child: Text(S.l.continue_),
           ),
         ],
         child: Column(
@@ -99,7 +101,7 @@ class _AgreementSheetState extends State<_AgreementSheet> {
               contentPadding: EdgeInsets.zero,
               controlAffinity: ListTileControlAffinity.leading,
               value: _agreed,
-              title: const Text('I have read and agree to the license'),
+              title: Text(S.l.iAgree),
               onChanged: (v) => setState(() => _agreed = v ?? false),
             ),
           ],

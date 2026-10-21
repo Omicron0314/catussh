@@ -10,6 +10,7 @@ import 'package:re_highlight/styles/atom-one-light.dart';
 
 import '../../app/router.dart';
 import '../../core/store.dart';
+import '../../core/strings.dart';
 import '../../sessions/editor_language.dart';
 import '../../sessions/editor_workspace.dart';
 import '../../ui/theme.dart';
@@ -32,12 +33,12 @@ class _EditorPageState extends State<EditorPage> {
   Future<void> _openByPath() async {
     final path = await promptText(
       context,
-      title: 'Open File',
+      title: S.l.openFile,
       initial: '${w.transfer.currentDir == '/' ? '' : w.transfer.currentDir}/',
-      hint: '/etc/hosts',
-      confirmTitle: 'Open',
+      hint: S.l.pathExample,
+      confirmTitle: S.l.openAction,
       monospace: true,
-      validate: (v) => v.startsWith('/') ? null : 'Use an absolute path starting with /.',
+      validate: (v) => v.startsWith('/') ? null : S.l.absolutePathRequired,
     );
     if (path != null) w.open(path);
   }
@@ -52,9 +53,9 @@ class _EditorPageState extends State<EditorPage> {
     if (doc.isEdited) {
       final ok = await requiresConfirmation(
         context,
-        message: 'Close ${doc.name} without saving?',
-        informative: "Your changes are lost if you don't save them.",
-        confirmTitle: 'Discard Changes',
+        message: S.l.closeFileWithoutSaving(doc.name),
+        informative: S.l.yourChangesLost,
+        confirmTitle: S.l.discardChanges,
         destructive: true,
         always: true,
       );
@@ -67,9 +68,9 @@ class _EditorPageState extends State<EditorPage> {
     if (doc.isEdited) {
       final ok = await requiresConfirmation(
         context,
-        message: 'Reload ${doc.name} from the server?',
-        informative: 'Your changes are replaced by the file on the server.',
-        confirmTitle: 'Reload from Server',
+        message: S.l.reloadFromServer(doc.name),
+        informative: S.l.changesReplaced,
+        confirmTitle: S.l.reloadFromServerAction,
         destructive: true,
         always: true,
       );
@@ -82,9 +83,9 @@ class _EditorPageState extends State<EditorPage> {
     if (w.hasUnsavedChanges) {
       final ok = await requiresConfirmation(
         context,
-        message: 'Close the editor on ${w.transfer.machine.name}?',
-        informative: 'Unsaved changes are lost.',
-        confirmTitle: 'Discard Changes and Close',
+        message: S.l.closeEditorOn(w.transfer.machine.name),
+        informative: S.l.unsavedChangesLost,
+        confirmTitle: S.l.discardAndClose,
         destructive: true,
         always: true,
       );
@@ -111,11 +112,11 @@ class _EditorPageState extends State<EditorPage> {
             scrollable: false,
             padding: const EdgeInsets.fromLTRB(RX.s6, 0, RX.s6, RX.s4),
             center: saved == null ? null : ServerToolSwitcher(machine: saved, current: ServerTool.editor),
-            leading: IconButton(tooltip: 'Open File… (Ctrl+O)', icon: const Icon(Icons.file_open_outlined), onPressed: _openByPath),
+            leading: IconButton(tooltip: S.l.openFileShortcut, icon: const Icon(Icons.file_open_outlined), onPressed: _openByPath),
             actions: [
               if (current != null) ...[
                 Tooltip(
-                  message: 'Syntax highlighting',
+                  message: S.l.syntaxHighlighting,
                   child: DropdownButton<EditorLanguage>(
                     value: current.language,
                     underline: const SizedBox(),
@@ -127,21 +128,21 @@ class _EditorPageState extends State<EditorPage> {
                   ),
                 ),
                 IconButton(
-                  tooltip: _wrap ? "Don't Wrap Lines" : 'Wrap Lines',
+                  tooltip: _wrap ? S.l.noWrapLines : S.l.wrapLines,
                   isSelected: _wrap,
                   icon: const Icon(Icons.wrap_text),
                   onPressed: () => setState(() => _wrap = !_wrap),
                 ),
-                IconButton(tooltip: 'Reload', icon: const Icon(Icons.refresh), onPressed: () => _reload(current)),
+                IconButton(tooltip: S.l.reload, icon: const Icon(Icons.refresh), onPressed: () => _reload(current)),
                 FilledButton.icon(
                   onPressed: current.isEdited && !current.saving ? () => _save(current) : null,
                   icon: current.saving
                       ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2))
                       : const Icon(Icons.save_outlined),
-                  label: Text(current.saving ? 'Saving…' : 'Save'),
+                  label: Text(current.saving ? S.l.saving : S.l.save),
                 ),
               ],
-              IconButton(tooltip: 'Close Editor', icon: const Icon(Icons.close), onPressed: _closeEditor),
+              IconButton(tooltip: S.l.closeEditor, icon: const Icon(Icons.close), onPressed: _closeEditor),
             ],
             body: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -153,10 +154,10 @@ class _EditorPageState extends State<EditorPage> {
                       ? RXCard(
                           child: Center(
                             child: EmptyStateView(
-                              'No file open',
+                              S.l.noFileOpen,
                               icon: Icons.edit_note,
-                              message: 'Double-click a text file in Files, or open one by its path.',
-                              actionTitle: 'Open File…',
+                              message: S.l.noFileOpenHelp,
+                              actionTitle: S.l.openFileEllipsis,
                               action: _openByPath,
                             ),
                           ),
@@ -197,7 +198,7 @@ class _Tabs extends StatelessWidget {
                   onPressed: () => workspace.select(d),
                   avatar: d.isEdited ? Icon(Icons.circle, size: 10, color: scheme.primary) : null,
                   label: Text(d.name),
-                  deleteButtonTooltipMessage: 'Close ${d.name}',
+                  deleteButtonTooltipMessage: S.l.closeFileName(d.name),
                   onDeleted: () => onClose(d),
                 ),
               ),
@@ -227,15 +228,15 @@ class _DocumentView extends StatelessWidget {
                 child: Column(mainAxisSize: MainAxisSize.min, children: [
                   const CircularProgressIndicator(),
                   const SizedBox(height: RX.s3),
-                  Text('Opening ${document.name}…'),
+                  Text(S.l.openingFile(document.name)),
                 ]),
               ),
             );
           case DocumentFailed(:final message):
             return RXCard(
               child: Center(
-                child: EmptyStateView("Can't open ${document.name}",
-                    icon: Icons.warning_amber_rounded, message: message, actionTitle: 'Try Again', action: document.load),
+                child: EmptyStateView(S.l.cannotOpenFile(document.name),
+                    icon: Icons.warning_amber_rounded, message: message, actionTitle: S.l.tryAgain, action: document.load),
               ),
             );
           case DocumentEditing():
@@ -297,10 +298,10 @@ class _EditorStatus extends StatelessWidget {
           height: 30,
           child: Row(children: [
             Expanded(child: Text(document.path, overflow: TextOverflow.ellipsis, style: RX.code(context, size: 11, color: style?.color))),
-            if (document.isEdited) Text('Edited    ', style: style),
+            if (document.isEdited) Text('${S.l.edited}    ', style: style),
             Text(document.language.title, style: style),
             const SizedBox(width: RX.s4),
-            Text('Ln ${sel.extentIndex + 1}, Col ${sel.extentOffset + 1}', style: style),
+            Text(S.l.caretPosition(sel.extentIndex + 1, sel.extentOffset + 1), style: style),
           ]),
         );
       },

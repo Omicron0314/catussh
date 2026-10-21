@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:xterm/xterm.dart';
 
 import '../../core/models.dart';
+import '../../core/strings.dart';
 import '../../core/store.dart';
 import '../../sessions/batch_exec.dart';
 import '../../ui/theme.dart';
@@ -70,8 +71,8 @@ class _BatchRunState extends State<_BatchRun> {
     return switch (state) {
       RunWaiting() => const SizedBox(width: 16),
       RunRunning() => const SizedBox(width: 14, height: 14, child: CircularProgressIndicator(strokeWidth: 2)),
-      RunDone() => Icon(Icons.check, size: 16, color: scheme.success, semanticLabel: 'Done'),
-      RunFailed() => Icon(Icons.close, size: 16, color: scheme.error, semanticLabel: 'Failed'),
+      RunDone() => Icon(Icons.check, size: 16, color: scheme.success, semanticLabel: S.l.done),
+      RunFailed() => Icon(Icons.close, size: 16, color: scheme.error, semanticLabel: S.l.failed),
     };
   }
 
@@ -82,13 +83,13 @@ class _BatchRunState extends State<_BatchRun> {
     final done = _exec.completedCount;
     final terminalTheme = resolveTerminalTheme(CatusshStore.shared.terminalTheme, scheme);
     return SheetDialog(
-      title: 'Run ${widget.snippet.name}',
+      title: S.l.runName(widget.snippet.name),
       width: 880,
       leadingActions: [
-        Text('$done of $total finished', style: TextStyle(color: scheme.onSurfaceVariant)),
+        Text(S.l.finishedOfTotal(done, total), style: TextStyle(color: scheme.onSurfaceVariant)),
       ],
       actions: [
-        if (!_exec.finished) OutlinedButton(onPressed: _exec.stopAll, child: const Text('Stop')),
+        if (!_exec.finished) OutlinedButton(onPressed: _exec.stopAll, child: Text(S.l.stop)),
         FilledButton(
           onPressed: () async {
             if (_exec.finished) {
@@ -96,13 +97,13 @@ class _BatchRunState extends State<_BatchRun> {
               return;
             }
             final ok = await requiresConfirmation(context,
-                message: 'Stop running ${widget.snippet.name}?', confirmTitle: 'Stop and Close', destructive: true);
+                message: S.l.stopRunning(widget.snippet.name), confirmTitle: S.l.stopAndClose, destructive: true);
             if (ok && context.mounted) {
               _exec.stopAll();
               Navigator.pop(context);
             }
           },
-          child: const Text('Done'),
+          child: Text(S.l.done),
         ),
       ],
       child: Column(
@@ -127,7 +128,7 @@ class _BatchRunState extends State<_BatchRun> {
                           selected: _selection == id,
                           selectedTileColor: scheme.secondaryContainer,
                           onTap: () => setState(() => _selection = id),
-                          title: Text(_exec.names[id] ?? 'Unknown server', maxLines: 1, overflow: TextOverflow.ellipsis),
+                          title: Text(_exec.names[id] ?? S.l.unknownServer, maxLines: 1, overflow: TextOverflow.ellipsis),
                           leading: _stateIcon(context, _exec.states[id] ?? const RunWaiting()),
                           trailing: Text(_duration(_exec.states[id] ?? const RunWaiting()),
                               style: const TextStyle(fontFeatures: [FontFeature.tabularFigures()])),

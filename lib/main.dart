@@ -6,6 +6,8 @@ import 'package:window_manager/window_manager.dart';
 
 import 'app/router.dart';
 import 'core/store.dart';
+import 'core/strings.dart';
+import 'l10n/app_localizations.dart';
 import 'features/shell/main_view.dart';
 import 'features/menubar/tray.dart';
 import 'ui/dynamic_accent.dart';
@@ -97,9 +99,19 @@ class _CatusshAppState extends State<CatusshApp> with WidgetsBindingObserver {
           builder: (context, dynamicSeed, _) {
             final seed = store.dynamicColor && dynamicSeed != null ? dynamicSeed : store.seedColor;
             ColorScheme scheme(Brightness b) => ColorScheme.fromSeed(seedColor: seed, brightness: b);
+            // Messages written outside widgets (sessions, stores) use the same
+            // locale the interface resolved to.
+            final locale = store.locale == 'system'
+                ? basicLocaleListResolution(
+                    WidgetsBinding.instance.platformDispatcher.locales, L10n.supportedLocales)
+                : Locale(store.locale);
+            S.setLocale(locale);
             return MaterialApp(
               title: 'catussh',
               debugShowCheckedModeBanner: false,
+              locale: locale,
+              localizationsDelegates: L10n.localizationsDelegates,
+              supportedLocales: L10n.supportedLocales,
               themeMode: store.appearance,
               theme: buildTheme(scheme(Brightness.light)),
               darkTheme: buildTheme(scheme(Brightness.dark)),

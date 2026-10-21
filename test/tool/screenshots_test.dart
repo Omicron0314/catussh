@@ -10,6 +10,8 @@ import 'dart:ui' as ui;
 import 'package:catussh/app/router.dart';
 import 'package:catussh/core/models.dart';
 import 'package:catussh/core/store.dart';
+import 'package:catussh/core/strings.dart';
+import 'package:catussh/l10n/app_localizations.dart';
 import 'package:catussh/core/vault.dart';
 import 'package:catussh/features/shell/main_view.dart';
 import 'package:catussh/ui/theme.dart';
@@ -37,12 +39,32 @@ void main() {
     await _loadFont('Roboto', ['$material/Roboto-Regular.ttf', '$material/Roboto-Medium.ttf', '$material/Roboto-Bold.ttf']);
     // The real app falls back through fontconfig; the test engine needs the arrows named.
     await _loadFont('DejaVu Sans', ['/usr/share/fonts/TTF/DejaVuSans.ttf']);
+    // A CJK face for the Chinese screenshots; the .ttc collection is taken
+    // apart first, which is all this tool needs fontTools on the machine for.
+    for (final (family, source, face) in [
+      ('Noto Sans CJK SC', '/usr/share/fonts/noto-cjk/NotoSansCJK-Regular.ttc', 2),
+      ('Noto Sans CJK SC', '/usr/share/fonts/noto-cjk/NotoSansCJK-Bold.ttc', 2),
+    ]) {
+      final out = '/tmp/catussh-font-$face-${source.split('/').last}.otf';
+      if (!File(out).existsSync() || File(out).lengthSync() < 1000000) {
+        await Process.run('python3', [
+          '-c',
+          'from fontTools.ttLib import TTCollection; import sys;'
+              'c = TTCollection(sys.argv[1]); c.fonts[int(sys.argv[3])].save(sys.argv[2])',
+          source,
+          out,
+          '$face',
+        ]);
+      }
+      if (File(out).existsSync()) await _loadFont(family, [out]);
+    }
     await _loadFont('MaterialIcons', ['$material/MaterialIcons-Regular.otf']);
     await _loadFont('monospace', ['/usr/share/fonts/TTF/DejaVuSansMono.ttf', '/usr/share/fonts/TTF/DejaVuSansMono-Bold.ttf']);
     Directory(out).createSync(recursive: true);
   });
 
-  Future<void> shoot(WidgetTester tester, String name, Brightness brightness, void Function(AppRouter) go, {int live = 0}) async {
+  Future<void> shoot(WidgetTester tester, String name, Brightness brightness, void Function(AppRouter) go,
+    {int live = 0, String locale = 'en'}) async {
     tester.view.devicePixelRatio = 1.5;
     tester.view.physicalSize = const Size(1280 * 1.5, 800 * 1.5);
     addTearDown(tester.view.reset);
@@ -53,12 +75,20 @@ void main() {
     final router = AppRouter(store);
     AppRouter.shared = router;
     final scheme = ColorScheme.fromSeed(seedColor: RX.accent, brightness: brightness);
+    S.setLocale(Locale(locale));
     final key = GlobalKey();
     await tester.pumpWidget(MultiProvider(
       providers: [ChangeNotifierProvider.value(value: store), ChangeNotifierProvider.value(value: router)],
       child: RepaintBoundary(
         key: key,
-        child: MaterialApp(debugShowCheckedModeBanner: false, theme: buildTheme(scheme), home: const MainView()),
+        child: MaterialApp(
+          debugShowCheckedModeBanner: false,
+          theme: buildTheme(scheme),
+          locale: Locale(locale),
+          localizationsDelegates: L10n.localizationsDelegates,
+          supportedLocales: L10n.supportedLocales,
+          home: const MainView(),
+        ),
       ),
     ));
     go(router);
@@ -80,7 +110,7 @@ void main() {
     await tester.runAsync(() async {
       final image = await boundary.toImage(pixelRatio: 1.5);
       final bytes = await image.toByteData(format: ui.ImageByteFormat.png);
-      File('$out/$name-${brightness.name}.png').writeAsBytesSync(bytes!.buffer.asUint8List());
+      File('$out/$name-${brightness.name}${locale == 'en' ? '' : '-$locale'}.png').writeAsBytesSync(bytes!.buffer.asUint8List());
     });
     router.shutdownAll();
     await tester.pumpWidget(const SizedBox());
@@ -89,6 +119,17 @@ void main() {
     await tester.runAsync(store.flush);
   }
 
+  for (final locale in ['en', 'zh']) {
+    for (final b in Brightness.values) {
+      testWidgets('home ${b.name} $locale',
+          (t) => shoot(t, 'home', b, (r) => r.go(Place.home), locale: locale), skip: skip != null);
+      testWidgets('servers ${b.name} $locale',
+          (t) => shoot(t, 'servers', b, (r) => r.go(Place.servers), locale: locale), skip: skip != null);
+    }
+    testWidgets('settings $locale',
+        (t) => shoot(t, 'settings', Brightness.dark, (r) => r.openSettings('terminal'), locale: locale),
+        skip: skip != null);
+  }
   for (final b in Brightness.values) {
     testWidgets('home ${b.name}', (t) => shoot(t, 'home', b, (r) => r.go(Place.home)), skip: skip != null);
     testWidgets('servers ${b.name}', (t) => shoot(t, 'servers', b, (r) => r.go(Place.servers)), skip: skip != null);

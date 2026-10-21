@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../core/store.dart';
+import '../core/strings.dart';
 import 'theme.dart';
 
 /// A page with a top bar (title, search, actions) and scrolling content.
@@ -51,7 +52,7 @@ class PageScaffold extends StatelessWidget {
                   : Align(alignment: Alignment.center, child: center),
             ),
             ...actions.expand((w) => [w, const SizedBox(width: RX.s2)]),
-            if (search != null) SizedBox(width: 240, child: SearchField(controller: search!, hint: searchHint ?? 'Search')),
+            if (search != null) SizedBox(width: 240, child: SearchField(controller: search!, hint: searchHint ?? S.l.search)),
           ],
         ),
       ),
@@ -106,7 +107,7 @@ class SearchField extends StatelessWidget {
               ? const SizedBox()
               : IconButton(
                   icon: const Icon(Icons.close, size: 18),
-                  tooltip: 'Clear',
+                  tooltip: S.l.clear,
                   onPressed: controller.clear,
                 ),
         ),
@@ -309,7 +310,7 @@ Future<bool> requiresConfirmation(
   BuildContext context, {
   required String message,
   String? informative,
-  String confirmTitle = 'Continue',
+  String? confirmTitle,
   bool destructive = false,
   bool always = false,
 }) async {
@@ -324,14 +325,14 @@ Future<bool> requiresConfirmation(
         child: Text(informative),
       ),
       actions: [
-        TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
+        TextButton(onPressed: () => Navigator.pop(context, false), child: Text(S.l.cancel)),
         FilledButton(
           style: destructive
               ? FilledButton.styleFrom(backgroundColor: scheme.error, foregroundColor: scheme.onError)
               : null,
           autofocus: true,
           onPressed: () => Navigator.pop(context, true),
-          child: Text(confirmTitle),
+          child: Text(confirmTitle ?? S.l.continue_),
         ),
       ],
     ),
@@ -344,12 +345,12 @@ Future<void> presentError(BuildContext context, String message) {
     context: context,
     builder: (context) => AlertDialog(
       icon: const Icon(Icons.error_outline),
-      title: const Text('Error'),
+      title: Text(S.l.error),
       content: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 480),
         child: SelectableText(message),
       ),
-      actions: [FilledButton(onPressed: () => Navigator.pop(context), child: const Text('OK'))],
+      actions: [FilledButton(onPressed: () => Navigator.pop(context), child: Text(S.l.ok))],
     ),
   );
 }
@@ -394,7 +395,7 @@ Future<String?> promptText(
             ),
           ),
           actions: [
-            TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+            TextButton(onPressed: () => Navigator.pop(context), child: Text(S.l.cancel)),
             FilledButton(onPressed: submit, child: Text(confirmTitle)),
           ],
         );
@@ -406,7 +407,7 @@ Future<String?> promptText(
 void copyToClipboard(BuildContext context, String text, {String? what}) {
   Clipboard.setData(ClipboardData(text: text));
   ScaffoldMessenger.maybeOf(context)?.showSnackBar(
-    SnackBar(content: Text(what == null ? 'Copied' : '$what copied'), duration: const Duration(seconds: 2)),
+    SnackBar(content: Text(S.l.copied(what ?? S.l.command)), duration: const Duration(seconds: 2)),
   );
 }
 

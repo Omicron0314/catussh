@@ -11,6 +11,7 @@ import 'dart:convert';
 
 import 'package:dartssh2/dartssh2.dart';
 
+import '../core/strings.dart';
 import '../core/known_hosts.dart';
 import '../core/models.dart';
 import '../core/store.dart';
@@ -56,27 +57,21 @@ class SshConnection {
     if (username != null) {
       candidates = candidates.where((i) => i.username == username).toList();
       if (candidates.isEmpty) {
-        throw ConnectFailure(
-          'No identity for $username authenticates automatically. Add one under Identities.',
-          authentication: true,
-        );
+        throw ConnectFailure(S.l.noIdentityForUser(username), authentication: true);
       }
     }
     if (candidates.isEmpty) {
-      throw ConnectFailure(
-        'No identity is set to authenticate automatically. Choose an identity for this server.',
-        authentication: true,
-      );
+      throw ConnectFailure(S.l.noAutoIdentity, authentication: true);
     }
 
     Object? lastError;
     for (final candidate in candidates) {
-      if (identity == null) hint?.call('[i] trying to authenticate with ${candidate.shortDescription()}');
+      if (identity == null) hint?.call(S.l.tryingIdentity(candidate.shortDescription()));
       final SSHSocket socket;
       try {
         socket = await SSHSocket.connect(host, port, timeout: timeout);
       } catch (error) {
-        throw ConnectFailure('Unable to connect for $host:$port ($error)');
+        throw ConnectFailure(S.l.unableToConnectTo(host, port, '$error'));
       }
       String? banner;
       final hostKeyRefused = Completer<bool>();
@@ -115,13 +110,13 @@ class SshConnection {
           lastError = error;
           continue;
         }
-        throw ConnectFailure('Unable to connect for $host:$port ($error)');
+        throw ConnectFailure(S.l.unableToConnectTo(host, port, '$error'));
       }
     }
     throw ConnectFailure(
       identity != null
-          ? 'The selected identity could not sign in to $host. ($lastError)'
-          : 'Failed to authenticate connection. Did you forget to add identity or enable auto authentication?',
+          ? S.l.identityCouldNotSignIn(host, '$lastError')
+          : S.l.failedToAuthenticate,
       authentication: true,
     );
   }
@@ -135,7 +130,7 @@ class SshConnection {
     store ??= CatusshStore.shared;
     final identity = store.associatedIdentity(machine);
     if (machine.associatedIdentity != null && identity == null) {
-      throw ConnectFailure('Malformed machine or identity data');
+      throw ConnectFailure(S.l.malformedMachine);
     }
     return open(
       host: machine.remoteAddress,

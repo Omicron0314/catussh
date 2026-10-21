@@ -5,6 +5,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/foundation.dart';
 
+import '../core/strings.dart';
 import '../core/models.dart';
 import '../core/store.dart';
 import '../monitor/server_status.dart';
@@ -100,7 +101,7 @@ class MonitorSession extends ChangeNotifier {
         } catch (error) {
           _connection = null;
           failures += 1;
-          phase = MonitorFailed('Unable to connect or authenticate ($error)');
+          phase = MonitorFailed(S.l.unableToConnectOrAuth('$error'));
           _notify();
         }
       }

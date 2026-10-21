@@ -21,6 +21,7 @@ import '../settings/settings_view.dart';
 import '../snippets/snippets_view.dart';
 import '../terminal/terminal_page.dart';
 import 'sidebar.dart';
+import 'title_bar.dart';
 
 class MainView extends StatefulWidget {
   const MainView({super.key});
@@ -116,39 +117,36 @@ class _MainViewState extends State<MainView> {
       },
       child: Scaffold(
         backgroundColor: scheme.surfaceContainer,
-        body: Row(
+        body: Column(
           children: [
-            AnimatedSize(
-              duration: const Duration(milliseconds: 200),
-              curve: Curves.easeOut,
-              child: _sidebarVisible
-                  ? Sidebar(onHide: () => setState(() => _sidebarVisible = false))
-                  : const SizedBox(width: 0),
+            // The GTK title bar is off; this one is the window's own.
+            TitleBar(
+              sidebarVisible: _sidebarVisible,
+              onToggleSidebar: () => setState(() => _sidebarVisible = !_sidebarVisible),
             ),
             Expanded(
-              child: Padding(
-                padding: EdgeInsets.fromLTRB(_sidebarVisible ? 0 : 8, 8, 8, 8),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(24),
-                  child: Material(
-                    color: scheme.surfaceContainerLow,
-                    child: Stack(
-                      children: [
-                        Positioned.fill(child: content),
-                        if (!_sidebarVisible)
-                          Positioned(
-                            left: 12,
-                            top: 12,
-                            child: IconButton.filledTonal(
-                              tooltip: 'Show Sidebar (Ctrl+\\)',
-                              icon: const Icon(Icons.view_sidebar_outlined),
-                              onPressed: () => setState(() => _sidebarVisible = true),
-                            ),
-                          ),
-                      ],
+              child: Row(
+                children: [
+                  AnimatedSize(
+                    duration: const Duration(milliseconds: 200),
+                    curve: Curves.easeOut,
+                    child: _sidebarVisible
+                        ? const Sidebar()
+                        : const SizedBox(width: 0),
+                  ),
+                  Expanded(
+                    child: Padding(
+                      padding: EdgeInsets.fromLTRB(_sidebarVisible ? 0 : 8, 0, 8, 8),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(24),
+                        child: Material(
+                          color: scheme.surfaceContainerLow,
+                          child: content,
+                        ),
+                      ),
                     ),
                   ),
-                ),
+                ],
               ),
             ),
           ],

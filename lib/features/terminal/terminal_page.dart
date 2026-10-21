@@ -10,6 +10,7 @@ import '../../app/router.dart';
 import '../../core/format.dart';
 import '../../core/models.dart';
 import '../../core/store.dart';
+import '../../core/strings.dart';
 import '../../sessions/monitor_session.dart';
 import '../../sessions/terminal_session.dart';
 import '../../ui/theme.dart';
@@ -79,15 +80,15 @@ class _TerminalPageState extends State<TerminalPage> {
               FilledButton.icon(
                 onPressed: session.reconnect,
                 icon: const Icon(Icons.refresh),
-                label: const Text('Reconnect'),
+                label: Text(S.l.reconnect),
               ),
             IconButton(
-              tooltip: 'Smaller Text (Ctrl+-)',
+              tooltip: S.l.smallerText,
               onPressed: store.terminalFontSize <= 4 ? null : () => _setFontSize(store, store.terminalFontSize - 1),
               icon: const Icon(Icons.text_decrease),
             ),
             IconButton(
-              tooltip: 'Larger Text (Ctrl+=)',
+              tooltip: S.l.largerText,
               onPressed: store.terminalFontSize >= 30 ? null : () => _setFontSize(store, store.terminalFontSize + 1),
               icon: const Icon(Icons.text_increase),
             ),
@@ -109,7 +110,7 @@ class _TerminalPageState extends State<TerminalPage> {
                             color: Colors.black.withValues(alpha: 0.35),
                             padding: const EdgeInsets.symmetric(horizontal: RX.s3),
                             alignment: Alignment.centerLeft,
-                            child: Text('Connection closed', style: TextStyle(color: terminalTheme.foreground)),
+                            child: Text(S.l.connectionClosed, style: TextStyle(color: terminalTheme.foreground)),
                           ),
                         Expanded(
                           child: GestureDetector(
@@ -157,30 +158,30 @@ class _TerminalPageState extends State<TerminalPage> {
     final session = widget.session;
     final selection = session.controller.selection;
     await runMenu(context, position, [
-      menuItem('Copy', Icons.content_copy, () {
+      menuItem(S.l.copy, Icons.content_copy, () {
         if (selection != null) {
           Clipboard.setData(ClipboardData(text: session.terminal.buffer.getText(selection)));
         }
       }, enabled: selection != null),
-      menuItem('Paste', Icons.content_paste, () async {
+      menuItem(S.l.paste, Icons.content_paste, () async {
         final data = await Clipboard.getData(Clipboard.kTextPlain);
         if (data?.text != null) session.terminal.paste(data!.text!);
       }),
-      menuItem('Select All', Icons.select_all, () {
+      menuItem(S.l.selectAllText, Icons.select_all, () {
         final buffer = session.terminal.buffer;
         session.controller.setSelection(
           buffer.createAnchor(0, 0),
           buffer.createAnchor(session.terminal.viewWidth, buffer.height - 1),
         );
       }),
-      menuItem('Clear Scrollback', Icons.clear_all, () {
+      menuItem(S.l.clearScrollback, Icons.clear_all, () {
         session.terminal.buffer.clear();
         session.terminal.buffer.setCursor(0, 0);
         session.terminal.write('\x0c');
       }),
       const PopupMenuDivider(),
-      if (session.closed) menuItem('Reconnect', Icons.refresh, session.reconnect),
-      menuItem('Close Session', Icons.close, () => closeTerminalAsking(context, session)),
+      if (session.closed) menuItem(S.l.reconnect, Icons.refresh, session.reconnect),
+      menuItem(S.l.closeSession, Icons.close, () => closeTerminalAsking(context, session)),
     ]);
   }
 }
@@ -207,7 +208,7 @@ class _SessionTabs extends StatelessWidget {
                 padding: const EdgeInsets.only(right: 4),
                 child: _SessionTab(session: t, selected: t.id == current.id, number: siblings.length > 1 ? index + 1 : null),
               ),
-            IconButton(tooltip: 'New Terminal (Ctrl+Shift+T)', icon: const Icon(Icons.add, size: 20), onPressed: onNew),
+            IconButton(tooltip: S.l.newTerminalShortcut, icon: const Icon(Icons.add, size: 20), onPressed: onNew),
           ],
         ),
       ),
@@ -226,12 +227,14 @@ class _SessionTab extends StatelessWidget {
     final scheme = Theme.of(context).colorScheme;
     final title = session.navigationSubtitle.isNotEmpty
         ? session.navigationSubtitle
-        : (number != null ? 'Terminal $number' : (session.remoteType == RemoteType.machine ? 'Terminal' : session.displayName));
+        : (number != null
+            ? S.l.terminalTab(number!)
+            : (session.remoteType == RemoteType.machine ? S.l.toolTerminal : session.displayName));
     return Hoverable(
       builder: (context, hovered) => GestureDetector(
         onSecondaryTapUp: (d) => runMenu(context, d.globalPosition, [
-          if (session.closed) menuItem('Reconnect', Icons.refresh, session.reconnect),
-          menuItem('Close Session', Icons.close, () => closeTerminalAsking(context, session)),
+          if (session.closed) menuItem(S.l.reconnect, Icons.refresh, session.reconnect),
+          menuItem(S.l.closeSession, Icons.close, () => closeTerminalAsking(context, session)),
         ]),
         child: Material(
           color: selected ? scheme.secondaryContainer : (hovered ? scheme.surfaceContainerHighest : Colors.transparent),
@@ -265,7 +268,7 @@ class _SessionTab extends StatelessWidget {
                       opacity: selected || hovered ? 1 : 0,
                       duration: const Duration(milliseconds: 120),
                       child: IconButton(
-                        tooltip: 'Close ${session.navigationTitle}',
+                        tooltip: S.l.closeTitle(session.navigationTitle),
                         iconSize: 14,
                         visualDensity: VisualDensity.compact,
                         icon: const Icon(Icons.close),
@@ -316,10 +319,12 @@ class _StatusBar extends StatelessWidget {
                   if (monitor.phase is! MonitorConnected || !monitor.status.hasData) return const SizedBox();
                   final s = monitor.status;
                   return Text(
-                    'CPU ${RXFormat.percent(s.processor.summary.sumUsed)}%    '
-                    'Mem ${RXFormat.percent(s.memoryUsedPercent)}%    '
-                    '↓ ${RXFormat.rateString(s.totalReceivePerSecond.toDouble())} '
-                    '↑ ${RXFormat.rateString(s.totalTransmitPerSecond.toDouble())}',
+                    S.l.liveFigures(
+                      RXFormat.percent(s.processor.summary.sumUsed),
+                      RXFormat.percent(s.memoryUsedPercent),
+                      RXFormat.rateString(s.totalReceivePerSecond.toDouble()),
+                      RXFormat.rateString(s.totalTransmitPerSecond.toDouble()),
+                    ),
                     style: style,
                   );
                 },

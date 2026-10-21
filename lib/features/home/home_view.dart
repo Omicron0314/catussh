@@ -10,6 +10,7 @@ import '../../core/format.dart';
 import '../../core/models.dart';
 import '../../core/ssh_command_reader.dart';
 import '../../core/store.dart';
+import '../../core/strings.dart';
 import '../../sessions/monitor_session.dart';
 import '../../ui/theme.dart';
 import '../../ui/widgets.dart';
@@ -27,7 +28,7 @@ class HomeView extends StatelessWidget {
         FilledButton.icon(
           onPressed: () => showServerEditor(context),
           icon: const Icon(Icons.add),
-          label: const Text('New Server'),
+          label: Text(S.l.newServer),
         ),
       ],
       body: Column(
@@ -42,11 +43,10 @@ class HomeView extends StatelessWidget {
                 constraints: const BoxConstraints(maxWidth: 640),
                 child: RXCard(
                   child: EmptyStateView(
-                    'Save a server to reach it in one click',
+                    S.l.emptyServersTitle,
                     icon: Icons.dns_outlined,
-                    message:
-                        'Saved servers keep their address, port and identity, and open a terminal, files or a monitor.',
-                    actionTitle: 'New Server',
+                    message: S.l.emptyServersMessage,
+                    actionTitle: S.l.newServer,
                     action: () => showServerEditor(context),
                   ),
                 ),
@@ -54,11 +54,11 @@ class HomeView extends StatelessWidget {
             )
           else ...[
             SectionTitle(
-              'Servers',
+              S.l.serversSection,
               count: store.machines.length,
               trailing: TextButton(
                 onPressed: () => context.read<AppRouter>().go(Place.servers),
-                child: const Text('Show All'),
+                child: Text(S.l.showAll),
               ),
             ),
             const SizedBox(height: RX.s3),
@@ -180,7 +180,7 @@ class _QuickConnectHeroState extends State<QuickConnectHero> {
                   enabledBorder: InputBorder.none,
                   focusedBorder: InputBorder.none,
                   filled: false,
-                  hintText: 'user@host:22',
+                  hintText: S.l.quickConnectHint,
                   hintStyle: RX.code(context, size: 22, color: scheme.onSurfaceVariant.withValues(alpha: 0.6)),
                 ),
                 onSubmitted: (_) => _connect(),
@@ -188,7 +188,7 @@ class _QuickConnectHeroState extends State<QuickConnectHero> {
             ),
           ),
           Tooltip(
-            message: 'Connect (Enter)',
+            message: S.l.connectEnter,
             child: AnimatedScale(
               duration: const Duration(milliseconds: 300),
               curve: Curves.elasticOut,
@@ -214,7 +214,7 @@ class _QuickConnectHeroState extends State<QuickConnectHero> {
               ? _ParsedCommand(key: ValueKey(parsed.command), command: parsed)
               : (!'ssh '.startsWith(_controller.text.toLowerCase())
                   ? Text(
-                      'Type user@host, user@host:port or a full ssh command.',
+                      S.l.quickConnectHelp,
                       key: const ValueKey('help'),
                       style: theme.textTheme.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
                     )
@@ -243,19 +243,19 @@ class _QuickConnectHeroState extends State<QuickConnectHero> {
             children: [
               Icon(Icons.warning_amber_rounded, size: 18, color: scheme.warning),
               Text(
-                'Quick Connect signs in with identities set to “Authenticate automatically”. You have none yet.',
+                S.l.quickConnectNoAutoIdentity,
                 style: theme.textTheme.bodySmall?.copyWith(color: scheme.warning),
               ),
               TextButton(
                 onPressed: () => context.read<AppRouter>().go(Place.identities),
-                child: const Text('Open Identities'),
+                child: Text(S.l.openIdentities),
               ),
             ],
           ),
         ],
         if (recents.isNotEmpty) ...[
           const SizedBox(height: RX.s5),
-          const CapsLabel('Recent'),
+          CapsLabel(S.l.recent),
           const SizedBox(height: RX.s2),
           ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 640),
@@ -326,9 +326,9 @@ class _ParsedCommand extends StatelessWidget {
       runSpacing: RX.s2,
       alignment: WrapAlignment.center,
       children: [
-        token('User', command.username, Icons.person_outline, scheme.primary),
-        token('Host', command.remoteAddress, Icons.lan_outlined, scheme.series2),
-        token('Port', command.remotePort, Icons.tag, scheme.onSurfaceVariant),
+        token(S.l.user, command.username, Icons.person_outline, scheme.primary),
+        token(S.l.host, command.remoteAddress, Icons.lan_outlined, scheme.series2),
+        token(S.l.port, command.remotePort, Icons.tag, scheme.onSurfaceVariant),
       ],
     );
   }
@@ -347,13 +347,13 @@ class RecentChip extends StatelessWidget {
       case RecentCommand(:final command):
         title = command.command.startsWith('ssh ') ? command.command.substring(4) : command.command;
       case RecentMachine(:final machine):
-        title = store.machine(machine)?.name ?? 'Deleted server';
+        title = store.machine(machine)?.name ?? S.l.deletedServer;
     }
     return GestureDetector(
       onSecondaryTapUp: (d) => runMenu(context, d.globalPosition, [
-        menuItem('Copy Command', Icons.copy, () => copyToClipboard(context, store.equivalentSSHCommand(record), what: 'Command')),
+        menuItem(S.l.copyCommand, Icons.copy, () => copyToClipboard(context, store.equivalentSSHCommand(record), what: S.l.command)),
         const PopupMenuDivider(),
-        menuItem('Remove from Recent', Icons.delete_outline, () => store.removeRecent(record),
+        menuItem(S.l.removeFromRecent, Icons.delete_outline, () => store.removeRecent(record),
             destructive: true, context: context),
       ]),
       child: ActionChip(
@@ -409,7 +409,7 @@ class ServerTile extends StatelessWidget {
             child: InkWell(
               onTap: () => router.show(ServerTool.terminal, machine),
               child: Tooltip(
-                message: 'Click to open a terminal',
+                message: S.l.clickToOpenTerminal,
                 waitDuration: const Duration(seconds: 1),
                 child: Padding(
                   padding: const EdgeInsets.all(RX.s4),
@@ -436,9 +436,9 @@ class ServerTile extends StatelessWidget {
                               ),
                             ),
                             if (connected)
-                              const Tooltip(
-                                message: 'A terminal is open',
-                                child: Padding(padding: EdgeInsets.only(top: 6), child: StatusDot(size: 7)),
+                              Tooltip(
+                                message: S.l.terminalOpen,
+                                child: const Padding(padding: EdgeInsets.only(top: 6), child: StatusDot(size: 7)),
                               ),
                           ],
                         ),
@@ -474,8 +474,8 @@ class _TileInfo extends StatelessWidget {
     final store = context.watch<CatusshStore>();
     final style = Theme.of(context).textTheme.bodySmall?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant);
     String identityName() {
-      if (machine.associatedIdentity == null) return 'Automatic';
-      return store.identity(machine.associatedIdentity)?.username ?? 'Missing';
+      if (machine.associatedIdentity == null) return S.l.automatic;
+      return store.identity(machine.associatedIdentity)?.username ?? S.l.missing;
     }
 
     Widget row(String title, String value) => SizedBox(
@@ -484,9 +484,9 @@ class _TileInfo extends StatelessWidget {
         );
     return Column(
       children: [
-        row('Last used', RXFormat.relative(machine.lastConnection)),
+        row(S.l.lastUsed, RXFormat.relative(machine.lastConnection)),
         const SizedBox(height: 4),
-        row('Identity', identityName()),
+        row(S.l.identityLabel, identityName()),
       ],
     );
   }
@@ -518,9 +518,9 @@ class _TileLive extends StatelessWidget {
           ),
         );
     return Column(children: [
-      bar('CPU', session.status.processor.summary.sumUsed, scheme.primary),
+      bar(S.l.cpu, session.status.processor.summary.sumUsed, scheme.primary),
       const SizedBox(height: 4),
-      bar('Memory', session.status.memoryUsedPercent, scheme.series2),
+      bar(S.l.memory, session.status.memoryUsedPercent, scheme.series2),
     ]);
   }
 }
@@ -568,7 +568,7 @@ class _TileActions extends StatelessWidget {
               style: style,
               onPressed: () => router.show(ServerTool.terminal, machine),
               icon: const Icon(Icons.terminal, size: 15),
-              label: const Text('Connect'),
+              label: Text(S.l.connect),
             ),
           ),
           const SizedBox(width: 6),
@@ -578,7 +578,7 @@ class _TileActions extends StatelessWidget {
           const Spacer(),
           Builder(
             builder: (context) => IconButton(
-              tooltip: 'More actions',
+              tooltip: S.l.moreActions,
               visualDensity: VisualDensity.compact,
               constraints: const BoxConstraints.tightFor(width: 32, height: 32),
               padding: EdgeInsets.zero,
@@ -605,7 +605,7 @@ class NewServerTile extends StatelessWidget {
     final scheme = Theme.of(context).colorScheme;
     return Hoverable(
       builder: (context, hovered) => Tooltip(
-        message: 'Add a server',
+        message: S.l.addServer,
         child: InkWell(
           borderRadius: BorderRadius.circular(16),
           onTap: () => showServerEditor(context),
@@ -627,7 +627,7 @@ class NewServerTile extends StatelessWidget {
                     child: Icon(Icons.add, color: hovered ? scheme.primary : scheme.onSurfaceVariant),
                   ),
                   const SizedBox(height: RX.s2),
-                  Text('New Server', style: TextStyle(color: hovered ? scheme.primary : scheme.onSurfaceVariant)),
+                  Text(S.l.newServer, style: TextStyle(color: hovered ? scheme.primary : scheme.onSurfaceVariant)),
                 ],
               ),
             ),

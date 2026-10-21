@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 
 import '../../core/models.dart';
 import '../../core/store.dart';
+import '../../core/strings.dart';
 import '../../ui/theme.dart';
 import '../../ui/widgets.dart';
 import 'servers_view.dart';
@@ -64,11 +65,11 @@ class _ServerPickerState extends State<_ServerPicker> {
                 _selected.addAll(shown.map((m) => m.id));
               }
             }),
-            child: Text(_selected.length == shown.length && shown.isNotEmpty ? 'Deselect All' : 'Select All'),
+            child: Text(_selected.length == shown.length && shown.isNotEmpty ? S.l.deselectAll : S.l.selectAll),
           ),
       ],
       actions: [
-        TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+        TextButton(onPressed: () => Navigator.pop(context), child: Text(S.l.cancel)),
         FilledButton(
           onPressed: _selected.isEmpty ? null : () => Navigator.pop(context, _selected.toList()),
           child: Text(widget.confirmTitle),
@@ -77,17 +78,17 @@ class _ServerPickerState extends State<_ServerPicker> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          SearchField(controller: _search, hint: 'Search servers'),
+          SearchField(controller: _search, hint: S.l.searchServers),
           const SizedBox(height: RX.s3),
           if (all.isEmpty)
-            const EmptyStateView('No servers yet', icon: Icons.dns_outlined)
+            EmptyStateView(S.l.noServersYet, icon: Icons.dns_outlined)
           else if (shown.isEmpty)
-            const EmptyStateView('No matches', icon: Icons.search)
+            EmptyStateView(S.l.noMatches, icon: Icons.search)
           else
             for (final (name, machines) in groups) ...[
               Padding(
                 padding: const EdgeInsets.fromLTRB(8, 8, 8, 2),
-                child: Text(name.isEmpty ? 'Default' : name,
+                child: Text(name.isEmpty ? S.l.defaultGroup : name,
                     style: theme.textTheme.labelMedium?.copyWith(color: theme.colorScheme.onSurfaceVariant)),
               ),
               for (final m in machines)

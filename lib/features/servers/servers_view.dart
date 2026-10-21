@@ -9,6 +9,7 @@ import '../../app/router.dart';
 import '../../core/format.dart';
 import '../../core/models.dart';
 import '../../core/store.dart';
+import '../../core/strings.dart';
 import '../../sessions/monitor_session.dart';
 import '../../ui/theme.dart';
 import '../../ui/widgets.dart';
@@ -67,11 +68,11 @@ class _ServersViewState extends State<ServersView> {
     Widget body;
     if (store.machines.isEmpty) {
       body = RXCard(
-        child: EmptyStateView('No servers yet',
-            icon: Icons.dns_outlined, actionTitle: 'New Server', action: () => showServerEditor(context)),
+        child: EmptyStateView(S.l.noServersYet,
+            icon: Icons.dns_outlined, actionTitle: S.l.newServer, action: () => showServerEditor(context)),
       );
     } else if (filtered.isEmpty) {
-      body = const RXCard(child: EmptyStateView('No matches', icon: Icons.search));
+      body = RXCard(child: EmptyStateView(S.l.noMatches, icon: Icons.search));
     } else {
       body = _ServersTable(groups: groups, selection: _selection, onSelect: (id) => setState(() => _selection = id));
     }
@@ -86,23 +87,23 @@ class _ServersViewState extends State<ServersView> {
       child: Focus(
         autofocus: true,
         child: PageScaffold(
-          title: 'Servers',
+          title: S.l.navServers,
           search: _search,
-          searchHint: 'Search servers',
+          searchHint: S.l.searchServers,
           actions: [
             const RedactionMenu(),
             Tooltip(
-              message: 'Pick several servers and open a terminal on each',
+              message: S.l.openTerminalsHelp,
               child: OutlinedButton.icon(
                 onPressed: store.machines.isEmpty ? null : () => openTerminals(context),
                 icon: const Icon(Icons.library_add_outlined, size: 18),
-                label: const Text('Open Terminals…'),
+                label: Text(S.l.openTerminals),
               ),
             ),
             FilledButton.icon(
               onPressed: () => showServerEditor(context),
               icon: const Icon(Icons.add),
-              label: const Text('New Server'),
+              label: Text(S.l.newServer),
             ),
           ],
           body: Column(
@@ -123,7 +124,7 @@ class _ServersViewState extends State<ServersView> {
   Future<void> openTerminals(BuildContext context) async {
     final router = context.read<AppRouter>();
     final store = context.read<CatusshStore>();
-    final picked = await pickServers(context, title: 'Open Terminals', confirmTitle: 'Open');
+    final picked = await pickServers(context, title: S.l.openTerminalsTitle, confirmTitle: S.l.openAction);
     if (picked == null || picked.isEmpty) return;
     final auto = store.openInterfaceAutomatically;
     String? first;
@@ -154,16 +155,16 @@ class RedactionMenu extends StatelessWidget {
         );
     return MenuAnchor(
       menuChildren: [
-        item('Show Everything', Icons.visibility_outlined, RedactedLevel.none),
-        item('Hide Addresses', Icons.visibility_off_outlined, RedactedLevel.sensitive),
-        item('Hide Names and Addresses', Icons.visibility_off, RedactedLevel.all),
+        item(S.l.showEverything, Icons.visibility_outlined, RedactedLevel.none),
+        item(S.l.hideAddresses, Icons.visibility_off_outlined, RedactedLevel.sensitive),
+        item(S.l.hideNamesAndAddresses, Icons.visibility_off, RedactedLevel.all),
       ],
       builder: (context, controller, _) => Tooltip(
         message: level.tooltip,
         child: TextButton.icon(
           onPressed: () => controller.isOpen ? controller.close() : controller.open(),
           icon: Icon(level == RedactedLevel.none ? Icons.visibility_outlined : Icons.visibility_off_outlined, size: 18),
-          label: const Text('Privacy'),
+          label: Text(S.l.privacy),
         ),
       ),
     );
@@ -186,10 +187,10 @@ class RedactionBanner extends StatelessWidget {
         children: [
           Icon(Icons.visibility_off_outlined, size: 18, color: scheme.onSecondaryContainer),
           const SizedBox(width: RX.s2),
-          Text(store.machineRedacted == RedactedLevel.all ? 'Names and addresses hidden' : 'Addresses hidden',
+          Text(store.machineRedacted == RedactedLevel.all ? S.l.namesAndAddressesHidden : S.l.addressesHidden,
               style: TextStyle(color: scheme.onSecondaryContainer)),
           const SizedBox(width: RX.s2),
-          TextButton(onPressed: () => store.update((s) => s.machineRedacted = RedactedLevel.none), child: const Text('Show')),
+          TextButton(onPressed: () => store.update((s) => s.machineRedacted = RedactedLevel.none), child: Text(S.l.show)),
         ],
       ),
     );
@@ -231,11 +232,11 @@ class _ServersTable extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: RX.s3),
         child: Row(
           children: [
-            const Expanded(child: CapsLabel('Name')),
-            const SizedBox(width: _Columns.address, child: CapsLabel('Address')),
-            if (columns.showIdentity) const SizedBox(width: _Columns.identity, child: CapsLabel('Identity')),
-            if (columns.showCPU) const SizedBox(width: _Columns.cpu, child: CapsLabel('CPU')),
-            if (columns.showLastUsed) const SizedBox(width: _Columns.lastUsed, child: CapsLabel('Last used')),
+            Expanded(child: CapsLabel(S.l.fieldName)),
+            SizedBox(width: _Columns.address, child: CapsLabel(S.l.fieldAddress)),
+            if (columns.showIdentity) SizedBox(width: _Columns.identity, child: CapsLabel(S.l.fieldIdentity)),
+            if (columns.showCPU) SizedBox(width: _Columns.cpu, child: CapsLabel(S.l.cpu)),
+            if (columns.showLastUsed) SizedBox(width: _Columns.lastUsed, child: CapsLabel(S.l.lastUsed)),
             const SizedBox(width: _Columns.actions),
           ],
         ),
@@ -294,8 +295,8 @@ class _ServerRow extends StatelessWidget {
     final scheme = theme.colorScheme;
     final monitor = router.monitorForMachine(machine.id);
     final identityName = machine.associatedIdentity == null
-        ? 'Automatic'
-        : (store.identity(machine.associatedIdentity)?.username ?? 'Missing');
+        ? S.l.automatic
+        : (store.identity(machine.associatedIdentity)?.username ?? S.l.missing);
     final muted = theme.textTheme.bodyMedium?.copyWith(color: scheme.onSurfaceVariant);
     const dense = VisualDensity(horizontal: -3, vertical: -3);
 
@@ -371,14 +372,14 @@ class _ServerRow extends StatelessWidget {
                         child: TextButton(
                             style: TextButton.styleFrom(visualDensity: dense),
                             onPressed: () => router.show(ServerTool.files, machine),
-                            child: const Text('Files')),
+                            child: Text(ServerTool.files.title)),
                       ),
                       Tooltip(
                         message: ServerTool.monitor.help,
                         child: TextButton(
                             style: TextButton.styleFrom(visualDensity: dense),
                             onPressed: () => router.show(ServerTool.monitor, machine),
-                            child: const Text('Monitor')),
+                            child: Text(ServerTool.monitor.title)),
                       ),
                       const SizedBox(width: 4),
                       Tooltip(
@@ -386,7 +387,7 @@ class _ServerRow extends StatelessWidget {
                         child: FilledButton.tonal(
                             style: FilledButton.styleFrom(visualDensity: dense),
                             onPressed: () => router.show(ServerTool.terminal, machine),
-                            child: const Text('Connect')),
+                            child: Text(S.l.connect)),
                       ),
                     ],
                   ),

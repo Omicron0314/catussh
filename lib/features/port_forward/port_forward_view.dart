@@ -8,6 +8,7 @@ import 'package:provider/provider.dart';
 import '../../app/router.dart';
 import '../../core/models.dart';
 import '../../core/store.dart';
+import '../../core/strings.dart';
 import '../../sessions/port_forward_session.dart';
 import '../../ui/theme.dart';
 import '../../ui/widgets.dart';
@@ -47,26 +48,26 @@ class _PortForwardViewState extends State<PortForwardView> {
     Widget body;
     if (store.portForwards.isEmpty) {
       body = RXCard(
-        child: EmptyStateView('No port forwards',
-            icon: Icons.arrow_forward, actionTitle: 'New Port Forward', action: () => showPortForwardEditor(context)),
+        child: EmptyStateView(S.l.noPortForwards,
+            icon: Icons.arrow_forward, actionTitle: S.l.newPortForward, action: () => showPortForwardEditor(context)),
       );
     } else if (filtered.isEmpty) {
-      body = const RXCard(child: EmptyStateView('No matches', icon: Icons.search));
+      body = RXCard(child: EmptyStateView(S.l.noMatches, icon: Icons.search));
     } else {
       body = RXCard(
         padding: const EdgeInsets.all(RX.s2),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const SizedBox(
+            SizedBox(
               height: 36,
               child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: RX.s3),
+                padding: const EdgeInsets.symmetric(horizontal: RX.s3),
                 child: Row(children: [
-                  SizedBox(width: _orientation, child: CapsLabel('Orientation')),
-                  SizedBox(width: _bind, child: CapsLabel('Bind')),
-                  Expanded(child: CapsLabel('Through')),
-                  Expanded(child: CapsLabel('Target')),
+                  SizedBox(width: _orientation, child: CapsLabel(S.l.orientation)),
+                  SizedBox(width: _bind, child: CapsLabel(S.l.bind)),
+                  Expanded(child: CapsLabel(S.l.through)),
+                  Expanded(child: CapsLabel(S.l.target)),
                   SizedBox(width: _status + _toggle),
                 ]),
               ),
@@ -89,19 +90,19 @@ class _PortForwardViewState extends State<PortForwardView> {
       child: Focus(
         autofocus: true,
         child: PageScaffold(
-          title: 'Port Forward',
+          title: S.l.portForwardTitle,
           search: _search,
-          searchHint: 'Search forwards',
+          searchHint: S.l.searchForwards,
           actions: [
             OutlinedButton.icon(
               onPressed: router.forwards.isEmpty ? null : router.stopAllForwards,
               icon: const Icon(Icons.stop_circle_outlined, size: 18),
-              label: const Text('Stop All'),
+              label: Text(S.l.stopAll),
             ),
             FilledButton.icon(
               onPressed: () => showPortForwardEditor(context),
               icon: const Icon(Icons.add),
-              label: const Text('New Port Forward'),
+              label: Text(S.l.newPortForward),
             ),
           ],
           body: SizedBox(width: double.infinity, child: body),
@@ -123,7 +124,7 @@ class PortForwardActions {
 
   static Future<void> delete(BuildContext context, PortForward forward) async {
     final ok = await requiresConfirmation(context,
-        message: 'Delete the forward on port ${forward.bindPort}?', confirmTitle: 'Delete', destructive: true);
+        message: S.l.deleteForward(forward.bindPort), confirmTitle: S.l.delete, destructive: true);
     if (!ok) return;
     AppRouter.shared.stopForward(forward.id);
     CatusshStore.shared.deletePortForward(forward.id);
@@ -134,10 +135,10 @@ class PortForwardActions {
 (String, bool) presentForward(PortForwardSession? session) {
   if (session == null) return ('', false);
   return switch (session.lifecycle) {
-    ForwardLifecycle.forwardRunning => ('Running', false),
-    ForwardLifecycle.failedConnect => ('Could not connect, retrying', true),
-    ForwardLifecycle.failedAuthenticate => ('Could not sign in, retrying', true),
-    ForwardLifecycle.forwardStopped => (session.lastError ?? 'Stopped, retrying', true),
+    ForwardLifecycle.forwardRunning => (S.l.forwardRunning, false),
+    ForwardLifecycle.failedConnect => (S.l.forwardFailedConnect, true),
+    ForwardLifecycle.failedAuthenticate => (S.l.forwardFailedAuth, true),
+    ForwardLifecycle.forwardStopped => (session.lastError ?? S.l.forwardStopped, true),
     _ => ('${session.lifecycle.label[0].toUpperCase()}${session.lifecycle.label.substring(1)}…', false),
   };
 }
@@ -166,13 +167,13 @@ class _ForwardRow extends StatelessWidget {
       onSecondaryTapUp: (d) {
         onSelect();
         runMenu(context, d.globalPosition, [
-          menuItem('Edit…', Icons.edit_outlined, edit, enabled: !running),
-          menuItem('Duplicate', Icons.copy_all_outlined, () => PortForwardActions.duplicate(forward)),
-          menuItem('Copy SSH Command', Icons.code,
-              () => copyToClipboard(context, forward.getCommand(machine, machine == null ? null : store.usernameFor(machine)) ?? '', what: 'Command'),
+          menuItem(S.l.edit, Icons.edit_outlined, edit, enabled: !running),
+          menuItem(S.l.duplicate, Icons.copy_all_outlined, () => PortForwardActions.duplicate(forward)),
+          menuItem(S.l.copyCommand, Icons.code,
+              () => copyToClipboard(context, forward.getCommand(machine, machine == null ? null : store.usernameFor(machine)) ?? '', what: S.l.command),
               enabled: valid),
           const PopupMenuDivider(),
-          menuItem('Delete…', Icons.delete_outline, () => PortForwardActions.delete(context, forward),
+          menuItem(S.l.deleteEllipsis, Icons.delete_outline, () => PortForwardActions.delete(context, forward),
               destructive: true, context: context),
         ]);
       },
@@ -196,14 +197,14 @@ class _ForwardRow extends StatelessWidget {
                       child: Container(
                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                         decoration: BoxDecoration(color: scheme.tertiaryContainer, borderRadius: BorderRadius.circular(8)),
-                        child: Text(forward.forwardReversed ? 'Listen remote' : 'Listen local',
+                        child: Text(forward.forwardReversed ? S.l.listenRemote : S.l.listenLocal,
                             style: Theme.of(context).textTheme.labelMedium?.copyWith(color: scheme.onTertiaryContainer)),
                       ),
                     ),
                   ),
                   SizedBox(width: _bind, child: Text(':${forward.bindPort}', style: RX.code(context, size: 13))),
                   Expanded(
-                    child: RedactableText(machine?.name ?? 'No server',
+                    child: RedactableText(machine?.name ?? S.l.noServer,
                         redacted: store.machineRedacted == RedactedLevel.all,
                         style: TextStyle(color: machine == null ? scheme.onSurfaceVariant : null)),
                   ),
@@ -229,7 +230,7 @@ class _ForwardRow extends StatelessWidget {
                   SizedBox(
                     width: _toggle,
                     child: Tooltip(
-                      message: valid ? (running ? 'Stop' : 'Start') : 'Incomplete',
+                      message: valid ? (running ? S.l.stop : S.l.start) : S.l.incomplete,
                       child: Switch(
                         value: running,
                         onChanged: !valid
@@ -304,30 +305,28 @@ class _ForwardEditorState extends State<_ForwardEditor> {
     }
 
     return SheetDialog(
-      title: widget.forward == null ? 'New Port Forward' : 'Edit Port Forward',
+      title: widget.forward == null ? S.l.newPortForward : S.l.editPortForward,
       actions: [
-        TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
-        OutlinedButton(onPressed: valid ? save : null, child: const Text('Save')),
-        FilledButton(onPressed: valid ? () => save(start: true) : null, child: const Text('Save and Start')),
+        TextButton(onPressed: () => Navigator.pop(context), child: Text(S.l.cancel)),
+        OutlinedButton(onPressed: valid ? save : null, child: Text(S.l.save)),
+        FilledButton(onPressed: valid ? () => save(start: true) : null, child: Text(S.l.saveAndStart)),
       ],
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Text(
-            _orientation == ForwardOrientation.listenLocal
-                ? 'This computer :port → server → target'
-                : 'Server :port → this computer → target',
+            _orientation == ForwardOrientation.listenLocal ? S.l.localForwardExplain : S.l.remoteForwardExplain,
             style: TextStyle(color: scheme.onSurfaceVariant),
           ),
           const SizedBox(height: RX.s4),
           FieldLabel(
-            'Orientation',
+            S.l.orientation,
             child: SizedBox(
               width: double.infinity,
               child: SegmentedButton<ForwardOrientation>(
-                segments: const [
-                  ButtonSegment(value: ForwardOrientation.listenLocal, label: Text('Listen local')),
-                  ButtonSegment(value: ForwardOrientation.listenRemote, label: Text('Listen remote')),
+                segments: [
+                  ButtonSegment(value: ForwardOrientation.listenLocal, label: Text(S.l.listenLocal)),
+                  ButtonSegment(value: ForwardOrientation.listenRemote, label: Text(S.l.listenRemote)),
                 ],
                 selected: {_orientation},
                 onSelectionChanged: (s) => setState(() => _orientation = s.first),
@@ -340,22 +339,22 @@ class _ForwardEditorState extends State<_ForwardEditor> {
             children: [
               SizedBox(
                 width: 130,
-                child: FieldLabel('Bind port',
+                child: FieldLabel(S.l.bindPort,
                     child: TextField(
                       controller: _bind,
                       style: mono,
                       decoration: InputDecoration(
-                          hintText: '5433', errorText: _bind.text.isEmpty || _portOk(_bind.text) ? null : '1–65535'),
+                          hintText: '5433', errorText: _bind.text.isEmpty || _portOk(_bind.text) ? null : S.l.portRange),
                     )),
               ),
               const SizedBox(width: RX.s4),
               Expanded(
                 child: FieldLabel(
-                  'Forward through',
+                  S.l.forwardThrough,
                   child: DropdownButtonFormField<String?>(
                     initialValue: machine == null ? null : _machine,
                     isExpanded: true,
-                    hint: const Text('Choose a server'),
+                    hint: Text(S.l.chooseServer),
                     items: [
                       for (final m in store.machines) DropdownMenuItem(value: m.id, child: Text(m.name, overflow: TextOverflow.ellipsis)),
                     ],
@@ -370,18 +369,18 @@ class _ForwardEditorState extends State<_ForwardEditor> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Expanded(
-                child: FieldLabel('Target host',
+                child: FieldLabel(S.l.targetHost,
                     child: TextField(controller: _host, style: mono, decoration: const InputDecoration(hintText: '127.0.0.1'))),
               ),
               const SizedBox(width: RX.s4),
               SizedBox(
                 width: 130,
-                child: FieldLabel('Target port',
+                child: FieldLabel(S.l.targetPort,
                     child: TextField(
                       controller: _port,
                       style: mono,
                       decoration: InputDecoration(
-                          hintText: '5432', errorText: _port.text.isEmpty || _portOk(_port.text) ? null : '1–65535'),
+                          hintText: '5432', errorText: _port.text.isEmpty || _portOk(_port.text) ? null : S.l.portRange),
                     )),
               ),
             ],
@@ -389,7 +388,7 @@ class _ForwardEditorState extends State<_ForwardEditor> {
           if (command != null) ...[
             const SizedBox(height: 14),
             FieldLabel(
-              'Equivalent command',
+              S.l.equivalentCommand,
               child: Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(color: scheme.surfaceContainerHighest, borderRadius: BorderRadius.circular(12)),

@@ -10,6 +10,7 @@ import 'package:flutter/foundation.dart';
 import 'package:tray_manager/tray_manager.dart' as tray;
 import 'package:window_manager/window_manager.dart';
 
+import '../../core/strings.dart';
 import '../../app/router.dart';
 import '../../core/format.dart';
 import '../../core/models.dart';
@@ -117,11 +118,11 @@ class _TrayCat {
 
     add(machine.name, () => _focus(ServerTool.monitor))?.isEnabled = false;
     menu.addSeparator();
-    add('Open Terminal', () => _focus(ServerTool.terminal));
-    add('Open Files', () => _focus(ServerTool.files));
-    add('Open Monitor', () => _focus(ServerTool.monitor));
+    add(S.l.openTerminal, () => _focus(ServerTool.terminal));
+    add(S.l.openFiles, () => _focus(ServerTool.files));
+    add(S.l.openMonitor, () => _focus(ServerTool.monitor));
     menu.addSeparator();
-    add('Remove from Tray', onClose);
+    add(S.l.removeFromTray, onClose);
     _icon.setContextMenu(menu);
     _menu = menu;
   }
@@ -143,11 +144,10 @@ class _TrayCat {
     }
     final s = session.status;
     final tooltip = session.phase is MonitorConnected && s.hasData
-        ? '${machine.name}\nCPU ${RXFormat.percent(s.processor.summary.sumUsed)}%  '
-            'Mem ${RXFormat.percent(s.memoryUsedPercent)}%\n'
-            '↑ ${RXFormat.rateString(s.totalTransmitPerSecond.toDouble())}  '
-            '↓ ${RXFormat.rateString(s.totalReceivePerSecond.toDouble())}'
-        : '${machine.name}\n${session.phase is MonitorFailed ? "Can't connect" : 'Connecting…'}';
+        ? '${machine.name}\n'
+            '${S.l.trayTooltipFigures(RXFormat.percent(s.processor.summary.sumUsed), RXFormat.percent(s.memoryUsedPercent))}\n'
+            '${S.l.trayTooltipRates(RXFormat.rateString(s.totalTransmitPerSecond.toDouble()), RXFormat.rateString(s.totalReceivePerSecond.toDouble()))}'
+        : '${machine.name}\n${session.phase is MonitorFailed ? S.l.cannotConnect : S.l.connecting}';
     _icon.setTooltip(tooltip);
   }
 

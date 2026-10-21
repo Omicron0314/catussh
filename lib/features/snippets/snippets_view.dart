@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 
 import '../../core/models.dart';
 import '../../core/store.dart';
+import '../../core/strings.dart';
 import '../../ui/theme.dart';
 import '../../ui/widgets.dart';
 import '../servers/server_picker.dart';
@@ -76,11 +77,11 @@ class _SnippetsViewState extends State<SnippetsView> {
     Widget body;
     if (store.snippets.isEmpty) {
       body = RXCard(
-        child: EmptyStateView('No snippets yet',
-            icon: Icons.code, actionTitle: 'New Snippet', action: () => showSnippetEditor(context)),
+        child: EmptyStateView(S.l.noSnippetsYet,
+            icon: Icons.code, actionTitle: S.l.newSnippet, action: () => showSnippetEditor(context)),
       );
     } else if (filtered.isEmpty) {
-      body = const RXCard(child: EmptyStateView('No matches', icon: Icons.search));
+      body = RXCard(child: EmptyStateView(S.l.noMatches, icon: Icons.search));
     } else {
       body = LayoutBuilder(builder: (context, c) {
         final columns = (c.maxWidth / 280).floor().clamp(1, 6);
@@ -94,19 +95,19 @@ class _SnippetsViewState extends State<SnippetsView> {
     }
 
     return PageScaffold(
-      title: 'Snippets',
+      title: S.l.snippetsTitle,
       search: _search,
-      searchHint: 'Search snippets',
+      searchHint: S.l.searchSnippets,
       leading: groupNames.isEmpty
           ? null
           : Tooltip(
-              message: 'Filter by group',
+              message: S.l.filterByGroup,
               child: DropdownButton<String?>(
                 value: _groupFilter,
                 underline: const SizedBox(),
                 borderRadius: BorderRadius.circular(12),
                 items: [
-                  const DropdownMenuItem(value: null, child: Text('All Groups')),
+                  DropdownMenuItem(value: null, child: Text(S.l.allGroups)),
                   for (final g in groupNames) DropdownMenuItem(value: g, child: Text(g)),
                 ],
                 onChanged: (v) => setState(() => _groupFilter = v),
@@ -116,7 +117,7 @@ class _SnippetsViewState extends State<SnippetsView> {
         FilledButton.icon(
           onPressed: () => showSnippetEditor(context),
           icon: const Icon(Icons.add),
-          label: const Text('New Snippet'),
+          label: Text(S.l.newSnippet),
         ),
       ],
       body: SizedBox(width: double.infinity, child: body),
@@ -127,10 +128,10 @@ class _SnippetsViewState extends State<SnippetsView> {
 class SnippetActions {
   static Future<void> run(BuildContext context, Snippet snippet) async {
     if (snippet.code.trim().isEmpty) {
-      await presentError(context, 'This snippet has no command to run.');
+      await presentError(context, S.l.snippetNoCommand);
       return;
     }
-    final machines = await pickServers(context, title: 'Run ${snippet.name}', confirmTitle: 'Run');
+    final machines = await pickServers(context, title: S.l.runName(snippet.name), confirmTitle: S.l.runAction);
     if (machines == null || machines.isEmpty || !context.mounted) return;
     await showBatchRun(context, snippet, machines);
   }
@@ -145,8 +146,8 @@ class SnippetActions {
   static Future<void> delete(BuildContext context, Snippet snippet) async {
     final ok = await requiresConfirmation(
       context,
-      message: 'Delete ${snippet.name.isEmpty ? 'this snippet' : snippet.name}?',
-      confirmTitle: 'Delete',
+      message: S.l.deleteTitle(snippet.name.isEmpty ? S.l.thisSnippet : snippet.name),
+      confirmTitle: S.l.delete,
       destructive: true,
     );
     if (ok) CatusshStore.shared.deleteSnippet(snippet.id);
@@ -171,12 +172,12 @@ class _SnippetTile extends StatelessWidget {
         child: GestureDetector(
           onDoubleTap: edit,
           onSecondaryTapUp: (d) => runMenu(context, d.globalPosition, [
-            menuItem('Run…', Icons.play_arrow, () => SnippetActions.run(context, snippet)),
-            menuItem('Edit…', Icons.edit_outlined, edit),
-            menuItem('Duplicate', Icons.copy_all_outlined, () => SnippetActions.duplicate(snippet)),
-            menuItem('Copy Command', Icons.content_copy, () => copyToClipboard(context, snippet.code, what: 'Command')),
+            menuItem(S.l.run, Icons.play_arrow, () => SnippetActions.run(context, snippet)),
+            menuItem(S.l.edit, Icons.edit_outlined, edit),
+            menuItem(S.l.duplicate, Icons.copy_all_outlined, () => SnippetActions.duplicate(snippet)),
+            menuItem(S.l.copyCommand, Icons.content_copy, () => copyToClipboard(context, snippet.code, what: S.l.command)),
             const PopupMenuDivider(),
-            menuItem('Delete…', Icons.delete_outline, () => SnippetActions.delete(context, snippet),
+            menuItem(S.l.deleteEllipsis, Icons.delete_outline, () => SnippetActions.delete(context, snippet),
                 destructive: true, context: context),
           ]),
           child: Card(
@@ -199,7 +200,7 @@ class _SnippetTile extends StatelessWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(snippet.name.isEmpty ? 'Untitled' : snippet.name,
+                            Text(snippet.name.isEmpty ? S.l.untitled : snippet.name,
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                                 style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w600)),
@@ -214,7 +215,7 @@ class _SnippetTile extends StatelessWidget {
                       FilledButton.tonal(
                         style: FilledButton.styleFrom(visualDensity: VisualDensity.compact),
                         onPressed: () => SnippetActions.run(context, snippet),
-                        child: const Text('Run…'),
+                        child: Text(S.l.run),
                       ),
                     ],
                   ),
@@ -289,7 +290,7 @@ class _SnippetEditorState extends State<_SnippetEditor> {
     final groups = store.snippets.map((s) => s.group).where((g) => g.isNotEmpty).toSet().toList()..sort();
     final scheme = Theme.of(context).colorScheme;
     return SheetDialog(
-      title: _isNew ? 'New Snippet' : 'Edit Snippet',
+      title: _isNew ? S.l.newSnippet : S.l.editSnippet,
       width: 600,
       leadingActions: [
         if (!_isNew)
@@ -297,8 +298,8 @@ class _SnippetEditorState extends State<_SnippetEditor> {
             style: TextButton.styleFrom(foregroundColor: scheme.error),
             onPressed: () async {
               final ok = await requiresConfirmation(context,
-                  message: 'Delete ${_draft.name.isEmpty ? 'this snippet' : _draft.name}?',
-                  confirmTitle: 'Delete',
+                  message: S.l.deleteTitle(_draft.name.isEmpty ? S.l.thisSnippet : _draft.name),
+                  confirmTitle: S.l.delete,
                   destructive: true);
               if (ok && context.mounted) {
                 store.deleteSnippet(_draft.id);
@@ -306,12 +307,12 @@ class _SnippetEditorState extends State<_SnippetEditor> {
               }
             },
             icon: const Icon(Icons.delete_outline),
-            label: const Text('Delete…'),
+            label: Text(S.l.deleteEllipsis),
           ),
       ],
       actions: [
-        TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
-        FilledButton(onPressed: _canSave ? _save : null, child: Text(_isNew ? 'Create' : 'Save')),
+        TextButton(onPressed: () => Navigator.pop(context), child: Text(S.l.cancel)),
+        FilledButton(onPressed: _canSave ? _save : null, child: Text(_isNew ? S.l.create : S.l.save)),
       ],
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -320,9 +321,9 @@ class _SnippetEditorState extends State<_SnippetEditor> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               FieldLabel(
-                'Icon',
+                S.l.iconLabel,
                 child: PopupMenuButton<String>(
-                  tooltip: 'Icon',
+                  tooltip: S.l.iconLabel,
                   onSelected: (v) => setState(() => _draft.avatar = v),
                   itemBuilder: (_) => [
                     PopupMenuItem(
@@ -357,19 +358,19 @@ class _SnippetEditorState extends State<_SnippetEditor> {
               ),
               const SizedBox(width: RX.s4),
               Expanded(
-                child: FieldLabel('Name',
+                child: FieldLabel(S.l.fieldName,
                     child: TextField(
-                        controller: _name, autofocus: true, decoration: const InputDecoration(hintText: 'Restart nginx'))),
+                        controller: _name, autofocus: true, decoration: InputDecoration(hintText: S.l.snippetNameHint))),
               ),
               const SizedBox(width: RX.s4),
               SizedBox(
                 width: 180,
                 child: FieldLabel(
-                  'Group',
+                  S.l.fieldGroup,
                   child: TextField(
                     controller: _group,
                     decoration: InputDecoration(
-                      hintText: 'Default',
+                      hintText: S.l.defaultGroup,
                       suffixIcon: groups.isEmpty
                           ? null
                           : PopupMenuButton<String>(
@@ -385,17 +386,18 @@ class _SnippetEditorState extends State<_SnippetEditor> {
           ),
           const SizedBox(height: 14),
           FieldLabel(
-            'Command',
+            S.l.command,
             child: TextField(
               controller: _code,
               minLines: 6,
               maxLines: 14,
               style: RX.code(context, size: 13),
-              decoration: const InputDecoration(hintText: 'sudo systemctl restart nginx'),
+              decoration: InputDecoration(hintText: S.l.codeHint),
             ),
           ),
           const SizedBox(height: 14),
-          FieldLabel('Comment', child: TextField(controller: _comment, decoration: const InputDecoration(hintText: 'Optional'))),
+          FieldLabel(S.l.fieldComment,
+              child: TextField(controller: _comment, decoration: InputDecoration(hintText: S.l.optional))),
         ],
       ),
     );

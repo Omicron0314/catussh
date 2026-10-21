@@ -7,6 +7,7 @@ import 'dart:io';
 import 'package:dartssh2/dartssh2.dart';
 import 'package:flutter/foundation.dart';
 
+import '../core/strings.dart';
 import '../core/models.dart';
 import '../core/store.dart';
 import '../ssh/connection.dart';
@@ -91,7 +92,7 @@ class FileTransferSession extends ChangeNotifier {
 
   Future<void> _connect() async {
     connectionPhase = ConnectionPhase.connecting;
-    _hint('Connecting...');
+    _hint(S.l.connectingEllipsis);
     try {
       final connection = await SshConnection.forMachine(machine, hint: _hint);
       if (_disposed) {
@@ -103,7 +104,7 @@ class FileTransferSession extends ChangeNotifier {
       try {
         _sftp = await connection.client.sftp();
       } catch (_) {
-        _hint('Failed to setup file transfer protocol');
+        _hint(S.l.failedSftpSetup);
         processShutdown();
         return;
       }
@@ -116,7 +117,7 @@ class FileTransferSession extends ChangeNotifier {
       _hint(failure.message);
       processShutdown(keepHint: true);
     } catch (error) {
-      _hint('Unable to connect for ${machine.remoteAddress}:${machine.remotePort}');
+      _hint(S.l.unableToConnectShort(machine.remoteAddress, machine.port));
       processShutdown(keepHint: true);
     }
   }
@@ -127,7 +128,7 @@ class FileTransferSession extends ChangeNotifier {
   }
 
   void processShutdown({bool keepHint = false}) {
-    if (!keepHint) currentHint = 'Connection Closed';
+    if (!keepHint) currentHint = S.l.connectionClosed;
     connectionPhase = ConnectionPhase.closed;
     currentFileList = [];
     isProgressRunning = false;
@@ -151,7 +152,7 @@ class FileTransferSession extends ChangeNotifier {
     if (sftp == null) return;
     final dir = currentDir;
     isProgressRunning = true;
-    _hint('Loading... $dir');
+    _hint(S.l.loadingPath(dir));
     try {
       final names = await sftp.listdir(dir);
       if (currentDir != dir) return;
@@ -162,10 +163,10 @@ class FileTransferSession extends ChangeNotifier {
           if (a.isDirectory != b.isDirectory) return a.isDirectory ? -1 : 1;
           return a.name.toLowerCase().compareTo(b.name.toLowerCase());
         });
-      _hint('Load Complete');
+      _hint(S.l.loadComplete);
     } catch (error) {
       currentFileList = [];
-      _hint('Failed to load $dir: ${_describe(error)}');
+      _hint(S.l.failedToLoadPath(dir, _describe(error)));
     }
     isProgressRunning = false;
     _notify();
@@ -228,7 +229,7 @@ class FileTransferSession extends ChangeNotifier {
 
   Future<String?> _run(String hint, Future<void> Function(SftpClient sftp) work) async {
     final sftp = _sftp;
-    if (sftp == null) return 'Not connected';
+    if (sftp == null) return S.l.notConnected;
     _hint(hint);
     try {
       await work(sftp);
@@ -242,13 +243,13 @@ class FileTransferSession extends ChangeNotifier {
   }
 
   Future<String?> createFolder(String name) =>
-      _run('Creating Folder ${joinRemote(currentDir, name)}...', (s) => s.mkdir(joinRemote(currentDir, name)));
+      _run(S.l.creatingFolderPath(joinRemote(currentDir, name)), (s) => s.mkdir(joinRemote(currentDir, name)));
 
   Future<String?> rename(RemoteFile file, String name) =>
-      _run('Renaming ${file.name}...', (s) => s.rename(file.path, joinRemote(file.directory, name)));
+      _run(S.l.renamingFile(file.name), (s) => s.rename(file.path, joinRemote(file.directory, name)));
 
   Future<String?> delete(RemoteFile file) =>
-      _run('Deleting ${file.name}...', (s) => _deleteRecursive(s, file.path, file.isDirectory));
+      _run(S.l.deletingFile(file.name), (s) => _deleteRecursive(s, file.path, file.isDirectory));
 
   Future<void> _deleteRecursive(SftpClient sftp, String path, bool isDirectory) async {
     if (!isDirectory) {
@@ -284,16 +285,16 @@ class FileTransferSession extends ChangeNotifier {
   /// Uploads local files and folders into the current folder.
   Future<String?> upload(List<String> localPaths) async {
     final sftp = _sftp;
-    if (sftp == null) return 'Not connected';
+    if (sftp == null) return S.l.notConnected;
     final into = currentDir;
     try {
       for (final local in localPaths) {
         if (_cancelTransfer) break;
         await _uploadEntity(sftp, local, into);
       }
-      _hint(_cancelTransfer ? 'Upload cancelled' : 'Upload complete');
+      _hint(_cancelTransfer ? S.l.uploadCancelled : S.l.uploadComplete);
     } catch (error) {
-      _hint('Upload failed: ${_describe(error)}');
+      _hint(S.l.uploadFailed(_describe(error)));
       _endTransfer();
       await loadCurrentFileList();
       return _describe(error);
@@ -337,12 +338,12 @@ class FileTransferSession extends ChangeNotifier {
   /// Downloads a file or folder into a local folder.
   Future<String?> download(RemoteFile file, String localDirectory) async {
     final sftp = _sftp;
-    if (sftp == null) return 'Not connected';
+    if (sftp == null) return S.l.notConnected;
     try {
       await _downloadEntity(sftp, file.path, file.isDirectory, file.name, localDirectory);
-      _hint(_cancelTransfer ? 'Download cancelled' : 'Download complete');
+      _hint(_cancelTransfer ? S.l.downloadCancelled : S.l.downloadComplete);
     } catch (error) {
-      _hint('Download failed: ${_describe(error)}');
+      _hint(S.l.downloadFailed(_describe(error)));
       _endTransfer();
       return _describe(error);
     }

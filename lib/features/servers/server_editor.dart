@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 import '../../app/router.dart';
 import '../../core/models.dart';
 import '../../core/store.dart';
+import '../../core/strings.dart';
 import '../../ssh/connection.dart';
 import '../../ui/theme.dart';
 import '../../ui/widgets.dart';
@@ -111,7 +112,7 @@ class _ServerEditorState extends State<ServerEditor> {
         _error = failure.message;
       });
       if (failure.authentication && chosen == null) {
-        setState(() => _error = 'No identity that authenticates automatically could sign in. Choose an identity.');
+        setState(() => _error = S.l.selectIdentityFirst);
         final picked = await pickIdentity(context);
         if (picked != null && mounted) {
           setState(() => _identity = picked);
@@ -127,16 +128,16 @@ class _ServerEditorState extends State<ServerEditor> {
     final groups = store.machineGroups;
     final mono = RX.code(context, size: 14);
     return SheetDialog(
-      title: _isNew ? 'New Server' : 'Edit Server',
+      title: _isNew ? S.l.newServer : S.l.editServer,
       actions: [
-        TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+        TextButton(onPressed: () => Navigator.pop(context), child: Text(S.l.cancel)),
         if (_connecting) ...[
           const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2)),
-          const Text('Connecting…'),
+          Text(S.l.connecting),
         ],
         if (_isNew) ...[
           Tooltip(
-            message: 'Save the server without connecting',
+            message: S.l.saveWithoutConnecting,
             child: OutlinedButton(
               onPressed: !_canSave || _connecting
                   ? null
@@ -144,14 +145,14 @@ class _ServerEditorState extends State<ServerEditor> {
                       _save();
                       Navigator.pop(context);
                     },
-              child: const Text('Add'),
+              child: Text(S.l.addServerAction),
             ),
           ),
           Tooltip(
-            message: 'Check the connection, then save the server',
+            message: S.l.checkThenSave,
             child: FilledButton(
               onPressed: !_canSave || _connecting ? null : _createAndConnect,
-              child: const Text('Add and Connect'),
+              child: Text(S.l.addAndConnect),
             ),
           ),
         ] else
@@ -162,13 +163,13 @@ class _ServerEditorState extends State<ServerEditor> {
                     _save();
                     Navigator.pop(context);
                   },
-            child: const Text('Save'),
+            child: Text(S.l.save),
           ),
       ],
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          FieldLabel('Name',
+          FieldLabel(S.l.fieldName,
               child: TextField(
                 controller: _name,
                 autofocus: true,
@@ -179,22 +180,22 @@ class _ServerEditorState extends State<ServerEditor> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Expanded(
-                child: FieldLabel('Address',
+                child: FieldLabel(S.l.fieldAddress,
                     child: TextField(
                       controller: _address,
                       autocorrect: false,
                       style: mono,
-                      decoration: const InputDecoration(hintText: 'Host name or IP address'),
+                      decoration: InputDecoration(hintText: S.l.hostPlaceholder),
                     )),
               ),
               const SizedBox(width: RX.s4),
               SizedBox(
                 width: 110,
-                child: FieldLabel('Port',
+                child: FieldLabel(S.l.fieldPort,
                     child: TextField(
                       controller: _port,
                       style: mono,
-                      decoration: InputDecoration(hintText: '22', errorText: _portIsValid ? null : '1–65535'),
+                      decoration: InputDecoration(hintText: '22', errorText: _portIsValid ? null : S.l.portRange),
                     )),
               ),
             ],
@@ -205,12 +206,12 @@ class _ServerEditorState extends State<ServerEditor> {
             children: [
               Expanded(
                 child: FieldLabel(
-                  'Identity',
+                  S.l.fieldIdentity,
                   child: DropdownButtonFormField<String?>(
                     initialValue: store.identity(_identity) == null ? null : _identity,
                     isExpanded: true,
                     items: [
-                      const DropdownMenuItem(value: null, child: Text('Automatic')),
+                      DropdownMenuItem(value: null, child: Text(S.l.automatic)),
                       for (final i in store.identities)
                         DropdownMenuItem(
                           value: i.id,
@@ -225,15 +226,15 @@ class _ServerEditorState extends State<ServerEditor> {
               const SizedBox(width: RX.s4),
               Expanded(
                 child: FieldLabel(
-                  'Group',
+                  S.l.fieldGroup,
                   child: TextField(
                     controller: _group,
                     decoration: InputDecoration(
-                      hintText: 'Default',
+                      hintText: S.l.groupDefaultHint,
                       suffixIcon: groups.isEmpty
                           ? null
                           : PopupMenuButton<String>(
-                              tooltip: 'Choose an existing group',
+                              tooltip: S.l.chooseExistingGroup,
                               icon: const Icon(Icons.expand_more),
                               onSelected: (g) => setState(() => _group.text = g),
                               itemBuilder: (_) => [for (final g in groups) PopupMenuItem(value: g, child: Text(g))],
@@ -245,14 +246,15 @@ class _ServerEditorState extends State<ServerEditor> {
             ],
           ),
           const SizedBox(height: 14),
-          FieldLabel('SFTP start folder',
+          FieldLabel(S.l.fieldStartFolder,
               child: TextField(controller: _startFolder, style: mono, decoration: const InputDecoration(hintText: '/'))),
           const SizedBox(height: 14),
-          FieldLabel('Comment', child: TextField(controller: _comment, decoration: const InputDecoration(hintText: 'Optional'))),
+          FieldLabel(S.l.fieldComment,
+              child: TextField(controller: _comment, decoration: InputDecoration(hintText: S.l.optional))),
           if (!_isNew) ...[
             const SizedBox(height: 14),
             FieldLabel(
-              'Last banner',
+              S.l.fieldLastBanner,
               child: Container(
                 width: double.infinity,
                 padding: const EdgeInsets.all(12),
@@ -261,7 +263,7 @@ class _ServerEditorState extends State<ServerEditor> {
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: SelectableText(
-                  widget.machine!.lastBanner.isEmpty ? 'None' : widget.machine!.lastBanner,
+                  widget.machine!.lastBanner.isEmpty ? S.l.none : widget.machine!.lastBanner,
                   style: RX.code(context, size: 12),
                 ),
               ),

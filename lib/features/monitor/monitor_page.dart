@@ -10,6 +10,7 @@ import '../../app/router.dart';
 import '../../core/format.dart';
 import '../../core/models.dart';
 import '../../core/store.dart';
+import '../../core/strings.dart';
 import '../../monitor/server_status.dart';
 import '../../sessions/monitor_session.dart';
 import '../../ui/theme.dart';
@@ -35,12 +36,12 @@ class MonitorPage extends StatelessWidget {
             if (session.isRefreshing)
               const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2)),
             IconButton(
-              tooltip: 'Show in Tray',
+              tooltip: S.l.showInTray,
               onPressed: TrayController.instance.available ? () => TrayController.instance.show(session.machine) : null,
               icon: const Icon(Icons.pets),
             ),
             IconButton(
-              tooltip: 'Close Monitor',
+              tooltip: S.l.closeMonitor,
               onPressed: () => AppRouter.shared.closeMonitor(session),
               icon: const Icon(Icons.close),
             ),
@@ -48,7 +49,7 @@ class MonitorPage extends StatelessWidget {
           body: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Text(store.machineRedacted == RedactedLevel.all ? 'Server' : session.machine.name,
+              Text(store.machineRedacted == RedactedLevel.all ? S.l.serverFallbackName : session.machine.name,
                   style: Theme.of(context).textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.w600)),
               const SizedBox(height: RX.s5),
               _Facts(session: session, redactAddress: store.machineRedacted != RedactedLevel.none),
@@ -91,10 +92,10 @@ class _Facts extends StatelessWidget {
         );
     return Wrap(
       children: [
-        fact('Hostname', system.hostname.isEmpty ? '—' : system.hostname),
-        fact('OS', system.releaseName.isEmpty ? '—' : system.releaseName),
-        fact('Uptime', RXFormat.duration(system.uptimeSec)),
-        fact('Address', session.machine.remoteAddress, mono: true, redacted: redactAddress),
+        fact(S.l.hostname, system.hostname.isEmpty ? '—' : system.hostname),
+        fact(S.l.os, system.releaseName.isEmpty ? '—' : system.releaseName),
+        fact(S.l.uptime, RXFormat.duration(system.uptimeSec)),
+        fact(S.l.address, session.machine.remoteAddress, mono: true, redacted: redactAddress),
       ],
     );
   }
@@ -109,15 +110,15 @@ class _Placeholder extends StatelessWidget {
     final phase = session.phase;
     return RXCard(
       child: switch (phase) {
-        MonitorFailed(:final message) => EmptyStateView("Can't connect",
-            icon: Icons.warning_amber_rounded, message: message, actionTitle: 'Try Again', action: session.retry),
-        MonitorClosed() => const EmptyStateView('Monitor closed', icon: Icons.monitor_heart_outlined),
-        _ => const Padding(
-            padding: EdgeInsets.all(RX.s6),
+        MonitorFailed(:final message) => EmptyStateView(S.l.cannotConnect,
+            icon: Icons.warning_amber_rounded, message: message, actionTitle: S.l.tryAgain, action: session.retry),
+        MonitorClosed() => EmptyStateView(S.l.monitorClosed, icon: Icons.monitor_heart_outlined),
+        _ => Padding(
+            padding: const EdgeInsets.all(RX.s6),
             child: Column(children: [
-              CircularProgressIndicator(),
-              SizedBox(height: RX.s3),
-              Text('Connecting…'),
+              const CircularProgressIndicator(),
+              const SizedBox(height: RX.s3),
+              Text(S.l.connecting),
             ]),
           ),
       },
@@ -311,13 +312,13 @@ class _LoadCard extends StatelessWidget {
     final system = session.status.system;
     return RXCard(
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        const _CardHead('Load'),
-        _Metric(system.load1.toStringAsFixed(2), '1 min'),
+        _CardHead(S.l.load),
+        _Metric(system.load1.toStringAsFixed(2), S.l.oneMinute),
         const SizedBox(height: RX.s5),
         _SubMetricRow([
-          _SubMetric('5 min', system.load5.toStringAsFixed(2)),
-          _SubMetric('15 min', system.load15.toStringAsFixed(2)),
-          _SubMetric('Processes', '${system.runningProcs}', unit: '/ ${system.totalProcs} running'),
+          _SubMetric(S.l.fiveMinutes, system.load5.toStringAsFixed(2)),
+          _SubMetric(S.l.fifteenMinutes, system.load15.toStringAsFixed(2)),
+          _SubMetric(S.l.processes, '${system.runningProcs}', unit: S.l.runningOfTotal(system.totalProcs)),
         ]),
       ]),
     );
@@ -345,8 +346,8 @@ class _ProcessorCardState extends State<_ProcessorCard> {
     return RXCard(
       child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
         _CardHead(
-          count == 0 ? 'Processor' : 'Processor · $count ${count == 1 ? 'core' : 'cores'}',
-          trailing: _Toggle(options: const ['Summary', 'Cores'], value: _view, onChanged: (v) => setState(() => _view = v)),
+          count == 0 ? S.l.processor : S.l.processorCores(count),
+          trailing: _Toggle(options: [S.l.summary, S.l.cores], value: _view, onChanged: (v) => setState(() => _view = v)),
         ),
         _Metric(RXFormat.oneDecimal(s.sumUsed), '%'),
         if (_view == 1) ...[
@@ -362,10 +363,10 @@ class _ProcessorCardState extends State<_ProcessorCard> {
           ]),
           const SizedBox(height: RX.s5),
           _SubMetricRow([
-            _SubMetric('User', RXFormat.oneDecimal(s.sumUser), unit: '%', swatch: scheme.primary),
-            _SubMetric('System', RXFormat.oneDecimal(s.sumSystem), unit: '%', swatch: scheme.series2),
-            _SubMetric('IO wait', RXFormat.oneDecimal(s.sumIOWait), unit: '%', swatch: scheme.warning),
-            _SubMetric('Nice', RXFormat.oneDecimal(s.sumNice), unit: '%', swatch: nice),
+            _SubMetric(S.l.user, RXFormat.oneDecimal(s.sumUser), unit: '%', swatch: scheme.primary),
+            _SubMetric(S.l.system, RXFormat.oneDecimal(s.sumSystem), unit: '%', swatch: scheme.series2),
+            _SubMetric(S.l.ioWait, RXFormat.oneDecimal(s.sumIOWait), unit: '%', swatch: scheme.warning),
+            _SubMetric(S.l.nice, RXFormat.oneDecimal(s.sumNice), unit: '%', swatch: nice),
           ]),
         ],
       ]),
@@ -379,7 +380,7 @@ class _CoreGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (cores.isEmpty) return const Text('No data');
+    if (cores.isEmpty) return Text(S.l.noData);
     final scheme = Theme.of(context).colorScheme;
     final perRow = cores.length > 64 ? 16 : 8;
     final height = cores.length > 64 ? 28.0 : 44.0;
@@ -446,10 +447,10 @@ class _MemoryCardState extends State<_MemoryCard> {
         UsageBar(height: 10, segments: [(swapTotal > 0 ? swapUsed / swapTotal : 0, scheme.primary)]),
         const SizedBox(height: RX.s3),
         Wrap(spacing: RX.s4, runSpacing: RX.s2, children: [
-          _Legend('Used', _kB(swapUsed), scheme.primary),
-          _Legend('Free', _kB(memory.swapFree), free),
+          _Legend(S.l.used, _kB(swapUsed), scheme.primary),
+          _Legend(S.l.free, _kB(memory.swapFree), free),
         ]),
-        if (swapTotal <= 0) ...[const SizedBox(height: RX.s3), const Text('No swap')],
+        if (swapTotal <= 0) ...[const SizedBox(height: RX.s3), Text(S.l.noSwap)],
       ];
     } else {
       body = [
@@ -461,17 +462,17 @@ class _MemoryCardState extends State<_MemoryCard> {
         ]),
         const SizedBox(height: RX.s3),
         Wrap(spacing: RX.s4, runSpacing: RX.s2, children: [
-          _Legend('Used', _kB(status.memoryUsedKB), scheme.primary),
-          _Legend('Cache', _kB(status.memoryCacheKB), scheme.series2),
-          _Legend('Free', _kB(memory.memFree), free),
+          _Legend(S.l.used, _kB(status.memoryUsedKB), scheme.primary),
+          _Legend(S.l.cache, _kB(status.memoryCacheKB), scheme.series2),
+          _Legend(S.l.free, _kB(memory.memFree), free),
         ]),
       ];
     }
     return RXCard(
       child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
         _CardHead(
-          total > 0 ? 'Memory · ${_kB(total)}' : 'Memory',
-          trailing: _Toggle(options: const ['RAM', 'Swap'], value: _view, onChanged: (v) => setState(() => _view = v)),
+          total > 0 ? S.l.memoryWithTotal(_kB(total)) : S.l.memory,
+          trailing: _Toggle(options: [S.l.ram, S.l.swap], value: _view, onChanged: (v) => setState(() => _view = v)),
         ),
         ...body,
       ]),
@@ -517,15 +518,15 @@ class _DiskCard extends StatelessWidget {
     final elements = session.status.fileSystem.elements;
     return RXCard(
       child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-        const _CardHead('Disks'),
-        if (elements.isEmpty) const Text('No data'),
+        _CardHead(S.l.disks),
+        if (elements.isEmpty) Text(S.l.noData),
         for (final e in elements)
           Padding(
             padding: const EdgeInsets.only(top: RX.s3),
             child: _UsageRow(
               name: e.mountPoint,
               value: '${RXFormat.percent(e.percent)}%',
-              detail: '${e.used} of ${e.size}',
+              detail: S.l.usedOfSize(e.used, e.size),
               bar: UsageBar(segments: [(e.percent / 100, _threshold(scheme, e.percent, scheme.primary))]),
             ),
           ),
@@ -555,9 +556,9 @@ class _ThroughputCard extends StatelessWidget {
             padding: const EdgeInsets.fromLTRB(RX.s4, RX.s4, RX.s4, 0),
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               _CardHead(
-                receive ? 'Receive' : 'Transmit',
+                receive ? S.l.receive : S.l.transmit,
                 trailing: peak > 0
-                    ? Text('peak ${RXFormat.rateString(peak)}',
+                    ? Text(S.l.peakRate(RXFormat.rateString(peak)),
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(color: scheme.onSurfaceVariant))
                     : null,
               ),
@@ -632,8 +633,8 @@ class _NetworkCard extends StatelessWidget {
     final peak = math.max(1, elements.fold<int>(1, (m, e) => math.max(m, math.max(e.rxBytesPerSec, e.txBytesPerSec)))).toDouble();
     return RXCard(
       child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-        const _CardHead('Network'),
-        if (elements.isEmpty) const Text('No data'),
+        _CardHead(S.l.network),
+        if (elements.isEmpty) Text(S.l.noData),
         for (final e in elements)
           Padding(
             padding: const EdgeInsets.only(top: RX.s3),
@@ -674,18 +675,18 @@ class _GraphicsCard extends StatelessWidget {
     final n = graphics.units.length;
     return RXCard(
       child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-        _CardHead('Graphics · $n ${n == 1 ? 'GPU' : 'GPUs'}',
-            trailing: Text('CUDA ${graphics.version}', style: theme.textTheme.bodySmall?.copyWith(color: scheme.onSurfaceVariant))),
+        _CardHead(S.l.gpuCount(n),
+            trailing: Text(S.l.cudaVersion(graphics.version), style: theme.textTheme.bodySmall?.copyWith(color: scheme.onSurfaceVariant))),
         for (final u in graphics.units)
           Padding(
             padding: const EdgeInsets.only(top: RX.s3),
             child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
               Row(children: [
                 Expanded(child: Text(u.name, overflow: TextOverflow.ellipsis, style: theme.textTheme.titleSmall)),
-                Text('Fan ${u.fanSpeed}', style: theme.textTheme.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
+                Text(S.l.fanSpeed(u.fanSpeed), style: theme.textTheme.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
               ]),
-              bar('GPU', u.gpuUtil, scheme.primary),
-              bar('VRAM', u.memoryTotal > 0 ? u.memoryUsed / u.memoryTotal * 100 : 0, scheme.series2),
+              bar(S.l.gpu, u.gpuUtil, scheme.primary),
+              bar(S.l.vram, u.memoryTotal > 0 ? u.memoryUsed / u.memoryTotal * 100 : 0, scheme.series2),
             ]),
           ),
       ]),

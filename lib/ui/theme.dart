@@ -41,7 +41,7 @@ ThemeData buildTheme(ColorScheme scheme) {
   );
   // Arrows (↑↓→) and CJK names from servers render even where the UI font
   // lacks them.
-  const fallback = ['DejaVu Sans', 'Noto Sans', 'Noto Sans CJK SC', 'Noto Color Emoji'];
+  const fallback = ['Noto Sans CJK SC', 'Noto Sans', 'DejaVu Sans', 'Noto Color Emoji'];
   return base.copyWith(
     textTheme: base.textTheme.apply(fontFamilyFallback: fallback),
     scaffoldBackgroundColor: scheme.surfaceContainerLow,

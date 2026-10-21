@@ -8,6 +8,7 @@ import 'package:dartssh2/dartssh2.dart';
 import 'package:flutter/foundation.dart';
 import 'package:xterm/xterm.dart';
 
+import '../core/strings.dart';
 import '../core/models.dart';
 import '../core/ssh_command_reader.dart';
 import '../core/store.dart';
@@ -81,7 +82,7 @@ class TerminalSession extends ChangeNotifier {
   Future<void> _bootstrap() async {
     _closed = false;
     _notify();
-    _putInformation('[*] Creating Connection');
+    _putInformation(S.l.creatingConnection);
     final store = CatusshStore.shared;
     try {
       final Machine target = machine;
@@ -123,10 +124,10 @@ class TerminalSession extends ChangeNotifier {
     if (_closed) return;
     if (exitFromShell && !_disposed) {
       _putInformation('');
-      _putInformation('[*] Connection Closed');
+      _putInformation(S.l.connectionClosedBanner);
     }
     if (lastError != null) {
-      _putInformation('[i] Last Error Provided By Backend');
+      _putInformation(S.l.lastErrorFromBackend);
       _putInformation('    $lastError');
     }
     _closed = true;
@@ -139,8 +140,8 @@ class TerminalSession extends ChangeNotifier {
 
   void reconnect() {
     if (!_closed) return;
-    _putInformation('[i] Reconnecting with the details from when this session started.');
-    _putInformation('    If the server was edited, open a new terminal instead.');
+    _putInformation(S.l.reconnectingNote);
+    _putInformation(S.l.reconnectingNoteHelp);
     _bootstrap();
   }
 

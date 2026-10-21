@@ -7,6 +7,7 @@ import 'package:file_selector/file_selector.dart';
 import 'package:flutter/material.dart';
 
 import '../../core/models.dart';
+import '../../core/strings.dart';
 import '../../ui/theme.dart';
 import '../../ui/widgets.dart';
 
@@ -99,9 +100,9 @@ class _IdentityFormState extends State<IdentityForm> {
       obscureText: !_showPassword,
       onChanged: (v) => _set(() => d.password = v),
       decoration: InputDecoration(
-        hintText: d.method == AuthMethod.password ? 'Required' : 'None',
+        hintText: d.method == AuthMethod.password ? S.l.required : S.l.none,
         suffixIcon: IconButton(
-          tooltip: _showPassword ? 'Hide' : 'Show',
+          tooltip: _showPassword ? S.l.hide : S.l.show,
           icon: Icon(_showPassword ? Icons.visibility_off_outlined : Icons.visibility_outlined),
           onPressed: () => setState(() => _showPassword = !_showPassword),
         ),
@@ -114,20 +115,20 @@ class _IdentityFormState extends State<IdentityForm> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Expanded(
-              child: FieldLabel('Username',
+              child: FieldLabel(S.l.fieldUsername,
                   child: TextField(
                     controller: _username,
                     autocorrect: false,
-                    decoration: const InputDecoration(hintText: 'root'),
+                    decoration: InputDecoration(hintText: S.l.usernamePlaceholder),
                     onChanged: (v) => _set(() => d.username = v),
                   )),
             ),
             const SizedBox(width: RX.s4),
             Expanded(
-              child: FieldLabel('Group',
+              child: FieldLabel(S.l.fieldGroup,
                   child: TextField(
                     controller: _group,
-                    decoration: const InputDecoration(hintText: 'Default'),
+                    decoration: InputDecoration(hintText: S.l.defaultGroup),
                     onChanged: (v) => _set(() => d.group = v),
                   )),
             ),
@@ -135,13 +136,13 @@ class _IdentityFormState extends State<IdentityForm> {
         ),
         const SizedBox(height: 14),
         FieldLabel(
-          'Authentication',
+          S.l.authentication,
           child: SizedBox(
             width: double.infinity,
             child: SegmentedButton<AuthMethod>(
-              segments: const [
-                ButtonSegment(value: AuthMethod.keyPair, label: Text('Key pair'), icon: Icon(Icons.key)),
-                ButtonSegment(value: AuthMethod.password, label: Text('Password'), icon: Icon(Icons.password)),
+              segments: [
+                ButtonSegment(value: AuthMethod.keyPair, label: Text(S.l.keyPair), icon: const Icon(Icons.key)),
+                ButtonSegment(value: AuthMethod.password, label: Text(S.l.password), icon: const Icon(Icons.password)),
               ],
               selected: {d.method},
               onSelectionChanged: (s) => _set(() => d.method = s.first),
@@ -151,45 +152,45 @@ class _IdentityFormState extends State<IdentityForm> {
         const SizedBox(height: 14),
         if (d.method == AuthMethod.keyPair) ...[
           FieldLabel(
-            'Private key',
+            S.l.privateKey,
             child: KeyField(
               text: d.privateKey,
               masked: true,
-              placeholder: 'No private key loaded',
-              loadTitle: 'Load Private Key…',
+              placeholder: S.l.noPrivateKeyLoaded,
+              loadTitle: S.l.loadPrivateKey,
               matches: (s) => s.contains('PRIVATE KEY'),
               onChanged: (v) => _set(() => d.privateKey = v),
             ),
           ),
           const SizedBox(height: 14),
           FieldLabel(
-            'Public key (optional)',
+            S.l.publicKeyOptional,
             child: KeyField(
               text: d.publicKey,
               masked: false,
-              placeholder: 'No public key loaded',
-              loadTitle: 'Load Public Key…',
+              placeholder: S.l.noPublicKeyLoaded,
+              loadTitle: S.l.loadPublicKey,
               matches: _looksLikePublicKey,
               onChanged: (v) => _set(() => d.publicKey = v),
             ),
           ),
           const SizedBox(height: 14),
-          FieldLabel('Passphrase', child: passwordField),
+          FieldLabel(S.l.passphrase, child: passwordField),
         ] else
-          FieldLabel('Password', child: passwordField),
+          FieldLabel(S.l.password, child: passwordField),
         const SizedBox(height: 14),
-        FieldLabel('Comment',
+        FieldLabel(S.l.fieldComment,
             child: TextField(
               controller: _comment,
-              decoration: const InputDecoration(hintText: 'Optional'),
+              decoration: InputDecoration(hintText: S.l.optional),
               onChanged: (v) => _set(() => d.comment = v),
             )),
         const SizedBox(height: 14),
         const Divider(),
         SwitchListTile(
           contentPadding: const EdgeInsets.symmetric(horizontal: 4),
-          title: const Text('Authenticate automatically'),
-          subtitle: Text('Required for Quick Connect.', style: TextStyle(color: scheme.onSurfaceVariant)),
+          title: Text(S.l.authenticateAutomatically),
+          subtitle: Text(S.l.authenticateAutomaticallyHelp, style: TextStyle(color: scheme.onSurfaceVariant)),
           value: d.automatic,
           onChanged: (v) => _set(() => d.automatic = v),
         ),
@@ -239,7 +240,7 @@ class KeyField extends StatelessWidget {
     try {
       content = await file.readAsString();
     } catch (_) {
-      if (context.mounted) await presentError(context, 'The file could not be read as text.');
+      if (context.mounted) await presentError(context, S.l.fileNotReadable);
       return;
     }
     if (!context.mounted) return;
@@ -249,9 +250,9 @@ class KeyField extends StatelessWidget {
     }
     final ok = await requiresConfirmation(
       context,
-      message: 'This file does not look like a ${masked ? 'private' : 'public'} key',
-      informative: 'Load it anyway?',
-      confirmTitle: 'Load',
+      message: S.l.notAKeyFile(masked ? S.l.privateKeyLower : S.l.publicKeyLower),
+      informative: S.l.loadItAnyway,
+      confirmTitle: S.l.load,
       always: true,
     );
     if (ok) onChanged(content);
@@ -282,12 +283,12 @@ class KeyField extends StatelessWidget {
         if (text.isNotEmpty) ...[
           if (!masked)
             IconButton(
-              tooltip: 'Copy',
+              tooltip: S.l.copy,
               icon: const Icon(Icons.content_copy, size: 18),
-              onPressed: () => copyToClipboard(context, text, what: 'Public key'),
+              onPressed: () => copyToClipboard(context, text, what: S.l.publicKey),
             ),
           IconButton(
-            tooltip: 'Remove',
+            tooltip: S.l.remove,
             icon: const Icon(Icons.remove_circle_outline, size: 20),
             onPressed: () => onChanged(''),
           ),

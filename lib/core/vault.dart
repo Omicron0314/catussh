@@ -14,6 +14,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:path_provider/path_provider.dart';
 
+import 'strings.dart';
+
 class Vault {
   Vault._(this.directory, this._key, this.problem);
 
@@ -53,8 +55,7 @@ class Vault {
       var encoded = await storage.read(key: _keyName);
       if (encoded == null) {
         if (await File('${dir.path}/data.sealed').exists()) {
-          return Vault._(dir, null,
-              'The key that opens your saved servers is missing from the system keyring.');
+          return Vault._(dir, null, S.l.vaultKeyMissing);
         }
         encoded = base64Encode(_randomBytes(32));
         await storage.write(key: _keyName, value: encoded);
@@ -62,8 +63,7 @@ class Vault {
       return Vault._(dir, SecretKey(base64Decode(encoded)), null);
     } catch (error) {
       debugPrint('keyring unavailable: $error');
-      return Vault._(dir, null,
-          'The system keyring (Secret Service) could not be reached, so servers and identities are kept for this run only.');
+      return Vault._(dir, null, S.l.vaultKeyringUnavailable);
     }
   }
 

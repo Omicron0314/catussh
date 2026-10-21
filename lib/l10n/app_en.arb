@@ -1,0 +1,1170 @@
+{
+  "@@locale": "en",
+  "about": "About",
+  "aboutVersionLine": "{version} (Flutter) · Linux",
+  "@aboutVersionLine": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "absolutePathRequired": "Use an absolute path starting with /.",
+  "accentColor": "Accent color",
+  "accentColorHelp": "Used when the desktop accent is off or unavailable.",
+  "acknowledgements": "Acknowledgements",
+  "addAndConnect": "Add and Connect",
+  "addServer": "Add a server",
+  "addServerAction": "Add",
+  "address": "Address",
+  "addressesHidden": "Addresses hidden",
+  "agreementEllipsis": "Agreement…",
+  "allGroups": "All Groups",
+  "appName": "catussh",
+  "appTagline": "SSH terminal, files and monitor for your servers.",
+  "appearance": "Appearance",
+  "askBeforeClosing": "Ask before closing a session",
+  "askBeforeClosingHelp": "Confirm before closing a connected terminal or deleting.",
+  "authenticateAutomatically": "Authenticate automatically",
+  "authenticateAutomaticallyHelp": "Required for Quick Connect.",
+  "authentication": "Authentication",
+  "automatic": "Automatic",
+  "basedOn": "Based on",
+  "basedOnText": "catussh by mizorewww, the continuation of Rayon by Lakr Aream (@Lakr233) and contributors. This version is not affiliated with or endorsed by them.",
+  "bind": "Bind",
+  "bindPort": "Bind port",
+  "cache": "Cache",
+  "cancel": "Cancel",
+  "cannotConnect": "Can't connect",
+  "cannotOpenFile": "Can't open {name}",
+  "@cannotOpenFile": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "caretPosition": "Ln {line}, Col {column}",
+  "@caretPosition": {
+    "placeholders": {
+      "line": {
+        "type": "int"
+      },
+      "column": {
+        "type": "int"
+      }
+    }
+  },
+  "changesReplaced": "Your changes are replaced by the file on the server.",
+  "checkThenSave": "Check the connection, then save the server",
+  "chineseSimplified": "简体中文",
+  "chineseTraditional": "繁體中文",
+  "choose": "Choose",
+  "chooseExistingGroup": "Choose an existing group",
+  "chooseIdentity": "Choose Identity",
+  "chooseServer": "Choose a server",
+  "clear": "Clear",
+  "clearScrollback": "Clear Scrollback",
+  "clickToOpenTerminal": "Click to open a terminal",
+  "close": "Close",
+  "closeAll": "Close All",
+  "closeEditor": "Close Editor",
+  "closeEditorOn": "Close the editor on {name}?",
+  "@closeEditorOn": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "closeEverythingOn": "Close everything open on {name}?",
+  "@closeEverythingOn": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "closeFileName": "Close {name}",
+  "@closeFileName": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "closeFileWithoutSaving": "Close {name} without saving?",
+  "@closeFileWithoutSaving": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "closeFiles": "Close Files",
+  "closeMonitor": "Close Monitor",
+  "closeSession": "Close Session",
+  "closeSessionOn": "Close the session on {name}?",
+  "@closeSessionOn": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "closeTerminal": "Close Terminal",
+  "closeTitle": "Close {title}",
+  "@closeTitle": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "closeTransfer": "Close the file transfer on {name}?",
+  "@closeTransfer": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "closeWindow": "Close",
+  "codeHint": "sudo systemctl restart nginx",
+  "colors": "Colors",
+  "command": "Command",
+  "connect": "Connect",
+  "connectEnter": "Connect (Enter)",
+  "connectFailedReason": "Could not reach {host} on port {port}.",
+  "@connectFailedReason": {
+    "placeholders": {
+      "host": {
+        "type": "String"
+      },
+      "port": {
+        "type": "int"
+      }
+    }
+  },
+  "connecting": "Connecting…",
+  "connectingEllipsis": "Connecting...",
+  "connection": "Connection",
+  "connectionClosed": "Connection closed",
+  "connectionClosedBanner": "[*] Connection Closed",
+  "connectionTimeout": "Connection timeout",
+  "connectionTimeoutHelp": "How long to wait for a server before giving up.",
+  "continue_": "Continue",
+  "copied": "{what} copied",
+  "copy": "Copy",
+  "copyAddress": "Copy Address",
+  "copyCommand": "Copy SSH Command",
+  "copyName": "Copy Name",
+  "copyPath": "Copy Path",
+  "copyPublicKey": "Copy Public Key",
+  "cores": "Cores",
+  "couldNotSave": "Couldn't save {name}. {error}",
+  "@couldNotSave": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "cpu": "CPU",
+  "create": "Create",
+  "creatingConnection": "[*] Creating Connection",
+  "creatingFolderPath": "Creating Folder {path}...",
+  "@creatingFolderPath": {
+    "placeholders": {
+      "path": {
+        "type": "String"
+      }
+    }
+  },
+  "cudaVersion": "CUDA {version}",
+  "@cudaVersion": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "dark": "Dark",
+  "daysAgo": "{count, plural, =1{yesterday} other{{count} days ago}}",
+  "@daysAgo": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "defaultGroup": "Default",
+  "delete": "Delete",
+  "deleteEllipsis": "Delete…",
+  "deleteFile": "Delete {name}?",
+  "@deleteFile": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "deleteFileWarning": "The file is deleted from the server. This cannot be undone.",
+  "deleteFolderWarning": "The folder and everything in it is deleted from the server. This cannot be undone.",
+  "deleteForward": "Delete the forward on port {port}?",
+  "@deleteForward": {
+    "placeholders": {
+      "port": {
+        "type": "int"
+      }
+    }
+  },
+  "deleteIdentity": "Delete identity {username}?",
+  "@deleteIdentity": {
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
+  "deleteServer": "Delete {name}?",
+  "@deleteServer": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "deleteServers": "Delete {count} servers?",
+  "@deleteServers": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "deleteTitle": "Delete {name}?",
+  "@deleteTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "deletedServer": "Deleted server",
+  "deletingFile": "Deleting {name}...",
+  "@deletingFile": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "deselectAll": "Deselect All",
+  "discardAndClose": "Discard Changes and Close",
+  "discardChanges": "Discard Changes",
+  "disks": "Disks",
+  "done": "Done",
+  "download": "Download",
+  "downloadCancelled": "Download cancelled",
+  "downloadComplete": "Download complete",
+  "downloadEllipsis": "Download…",
+  "downloadFailed": "Download failed: {error}",
+  "@downloadFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "downloadHere": "Download Here",
+  "dropToUpload": "Drop to upload to {path}",
+  "@dropToUpload": {
+    "placeholders": {
+      "path": {
+        "type": "String"
+      }
+    }
+  },
+  "duplicate": "Duplicate",
+  "duplicateServer": "Duplicate {name}?",
+  "@duplicateServer": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "durationDaysHours": "{days}d {hours}h",
+  "@durationDaysHours": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      },
+      "hours": {
+        "type": "int"
+      }
+    }
+  },
+  "durationHoursMinutes": "{hours}h {minutes}m",
+  "@durationHoursMinutes": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      },
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "durationMinutes": "{minutes}m",
+  "@durationMinutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "edit": "Edit…",
+  "editAction": "Edit",
+  "editPortForward": "Edit Port Forward",
+  "editServer": "Edit Server",
+  "editSnippet": "Edit Snippet",
+  "edited": "Edited",
+  "emptyFolder": "Empty folder",
+  "emptyServersMessage": "Saved servers keep their address, port and identity, and open a terminal, files or a monitor.",
+  "emptyServersTitle": "Save a server to reach it in one click",
+  "enclosingFolder": "Enclosing Folder (Alt+Up)",
+  "english": "English",
+  "equivalentCommand": "Equivalent command",
+  "error": "Error",
+  "eula": "End User License Agreement",
+  "everySeconds": "Every {seconds} s",
+  "@everySeconds": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "execBegin": "[*] Execute Begin",
+  "execCannotConnect": "[E] Could not connect to the server",
+  "execCannotSignIn": "[E] The identity could not sign in",
+  "execCompleted": "[*] Execution completed",
+  "execStopped": "[*] Stopped",
+  "failed": "Failed",
+  "failedSftpSetup": "Failed to setup file transfer protocol",
+  "failedToAuthenticate": "Failed to authenticate connection. Did you forget to add identity or enable auto authentication?",
+  "failedToLoadPath": "Failed to load {path}: {error}",
+  "@failedToLoadPath": {
+    "placeholders": {
+      "path": {
+        "type": "String"
+      },
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "fanSpeed": "Fan {speed}",
+  "@fanSpeed": {
+    "placeholders": {
+      "speed": {
+        "type": "String"
+      }
+    }
+  },
+  "fieldAddress": "Address",
+  "fieldComment": "Comment",
+  "fieldGroup": "Group",
+  "fieldIdentity": "Identity",
+  "fieldLastBanner": "Last banner",
+  "fieldName": "Name",
+  "fieldPort": "Port",
+  "fieldStartFolder": "SFTP start folder",
+  "fieldUsername": "Username",
+  "fifteenMinutes": "15 min",
+  "fileNotReadable": "The file could not be read as text.",
+  "fileSize": "Size",
+  "fileTransfer": "File Transfer",
+  "filterByGroup": "Filter by group",
+  "filterThisFolder": "Filter this folder",
+  "finishedOfTotal": "{done} of {total} finished",
+  "@finishedOfTotal": {
+    "placeholders": {
+      "done": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "fiveMinutes": "5 min",
+  "followSystem": "Follow System",
+  "font": "Font",
+  "fontHelp": "Installed monospace fonts.",
+  "fontSize": "Size",
+  "fontSizeHelp": "Ctrl+= and Ctrl+- change it in a terminal.",
+  "forget": "Forget",
+  "forgetAll": "Forget All…",
+  "forgetAllAction": "Forget All",
+  "forgetAllHostKeys": "Forget all saved host keys?",
+  "forgetAllHostKeysHelp": "The key each server presents on its next connection is saved as its key.",
+  "forgetHostKey": "Forget Host Key…",
+  "forgetHostKeyExplain": "The key the server presents on the next connection is saved as its key. Do this only when you know its keys were replaced.",
+  "forgetHostKeyOf": "Forget the host key of {name}?",
+  "@forgetHostKeyOf": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "forwardFailedAuth": "Could not sign in, retrying",
+  "forwardFailedConnect": "Could not connect, retrying",
+  "forwardRunning": "Running",
+  "forwardStopped": "Stopped, retrying",
+  "forwardThrough": "Forward through",
+  "free": "Free",
+  "general": "General",
+  "goAction": "Go",
+  "goToFolder": "Go to Folder",
+  "goToFolderShortcut": "Go to Folder (Ctrl+Shift+G)",
+  "gpu": "GPU",
+  "gpuCount": "Graphics · {count, plural, =1{1 GPU} other{{count} GPUs}}",
+  "@gpuCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "graphics": "Graphics",
+  "groupDefaultHint": "Default",
+  "hide": "Hide",
+  "hideAddresses": "Hide Addresses",
+  "hideNamesAndAddresses": "Hide Names and Addresses",
+  "hideSidebar": "Hide Sidebar (Ctrl+\\)",
+  "host": "Host",
+  "hostKeyChanged": "The host key of {host}:{port} has changed, so the connection was refused.",
+  "@hostKeyChanged": {
+    "placeholders": {
+      "host": {
+        "type": "String"
+      },
+      "port": {
+        "type": "int"
+      }
+    }
+  },
+  "hostKeyChangedHelp": "If the server was reinstalled or its keys were replaced, choose Forget Host Key for it and connect again. If not, something may be intercepting the connection.",
+  "hostKeyOffered": "Offered: {type} {fingerprint}",
+  "@hostKeyOffered": {
+    "placeholders": {
+      "type": {
+        "type": "String"
+      },
+      "fingerprint": {
+        "type": "String"
+      }
+    }
+  },
+  "hostKeySaved": "Saved: {type} {fingerprint}",
+  "@hostKeySaved": {
+    "placeholders": {
+      "type": {
+        "type": "String"
+      },
+      "fingerprint": {
+        "type": "String"
+      }
+    }
+  },
+  "hostKeysSaved": "{count, plural, =0{No keys saved yet} =1{1 key saved} other{{count} keys saved}}",
+  "@hostKeysSaved": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "hostPlaceholder": "Host name or IP address",
+  "hostname": "Hostname",
+  "hoursAgo": "{count, plural, =1{1 hour ago} other{{count} hours ago}}",
+  "@hoursAgo": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "iAgree": "I have read and agree to the license",
+  "iconLabel": "Icon",
+  "identitiesTitle": "Identities",
+  "identityCouldNotSignIn": "The selected identity could not sign in to {host}. ({error})",
+  "@identityCouldNotSignIn": {
+    "placeholders": {
+      "host": {
+        "type": "String"
+      },
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "identityEmptyMessage": "A username with a password or key.",
+  "identityGroup": "Group<{group}>",
+  "@identityGroup": {
+    "placeholders": {
+      "group": {
+        "type": "String"
+      }
+    }
+  },
+  "identityInUse": "{count, plural, =1{1 server uses it and will try automatic identities instead.} other{{count} servers use it and will try automatic identities instead.}}",
+  "@identityInUse": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "identityLabel": "Identity",
+  "identityRemoved": "Its password and keys are removed from catussh.",
+  "identityShort": "User {username} with {type}",
+  "@identityShort": {
+    "placeholders": {
+      "username": {
+        "type": "String"
+      },
+      "type": {
+        "type": "String"
+      }
+    }
+  },
+  "inDays": "in {count} days",
+  "@inDays": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "inHours": "in {count} hours",
+  "@inHours": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "inMinutes": "in {count} minutes",
+  "@inMinutes": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "includeQuickConnect": "Include Quick Connect commands",
+  "includeQuickConnectHelp": "Also remember user@host commands typed on Home.",
+  "incomplete": "Incomplete",
+  "invalidForward": "Invalid Forward",
+  "invalidName": "That name contains characters a file name cannot have.",
+  "ioWait": "IO wait",
+  "issues": "Issues",
+  "issuesHelp": "Bugs and ideas go to the project's issue tracker.",
+  "keyPair": "Key pair",
+  "keyTypeKeyPair": "Key Pair",
+  "keyTypePlainKeyPair": "Plain Key Pair",
+  "keyTypePlainPrivateKey": "Plain Private Key",
+  "keyTypePrivateKey": "Private Key",
+  "keyboard": "Keyboard",
+  "language": "Language",
+  "languageHelp": "Menus and messages. Dates follow too; server names and terminal output stay as they are.",
+  "largerText": "Larger Text (Ctrl+=)",
+  "lastErrorFromBackend": "[i] Last Error Provided By Backend",
+  "lastUsed": "Last used",
+  "legal": "Legal",
+  "libraries": "Libraries",
+  "librariesText": "Flutter · dartssh2 · xterm.dart · re_editor · dynamic_color · tray_manager · cryptography",
+  "license": "License",
+  "licenseEllipsis": "License…",
+  "light": "Light",
+  "lightOrDark": "Light or dark",
+  "listenLocal": "Listen local",
+  "listenRemote": "Listen remote",
+  "liveFigures": "CPU {cpu}%    Mem {memory}%    ↓ {receive} ↑ {transmit}",
+  "@liveFigures": {
+    "placeholders": {
+      "cpu": {
+        "type": "String"
+      },
+      "memory": {
+        "type": "String"
+      },
+      "receive": {
+        "type": "String"
+      },
+      "transmit": {
+        "type": "String"
+      }
+    }
+  },
+  "load": "Load",
+  "loadComplete": "Load Complete",
+  "loadItAnyway": "Load it anyway?",
+  "loadPrivateKey": "Load Private Key…",
+  "loadPublicKey": "Load Public Key…",
+  "loadingPath": "Loading... {path}",
+  "@loadingPath": {
+    "placeholders": {
+      "path": {
+        "type": "String"
+      }
+    }
+  },
+  "localForwardExplain": "This computer :port → server → target",
+  "localForwardShort": "localhost:{bind} -{server}-> {host}:{port}",
+  "@localForwardShort": {
+    "placeholders": {
+      "bind": {
+        "type": "int"
+      },
+      "server": {
+        "type": "String"
+      },
+      "host": {
+        "type": "String"
+      },
+      "port": {
+        "type": "int"
+      }
+    }
+  },
+  "malformedMachine": "Malformed machine or identity data",
+  "malformedMachineInfo": "[*] Malformed Machine Info",
+  "materialYou": "Material You",
+  "maximizeWindow": "Maximize",
+  "memory": "Memory",
+  "memoryWithTotal": "Memory · {total}",
+  "@memoryWithTotal": {
+    "placeholders": {
+      "total": {
+        "type": "String"
+      }
+    }
+  },
+  "minimizeWindow": "Minimize",
+  "minutesAgo": "{count, plural, =1{1 minute ago} other{{count} minutes ago}}",
+  "@minutesAgo": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "missing": "Missing",
+  "modified": "Modified",
+  "monitor": "Monitor",
+  "monitorClosed": "Monitor closed",
+  "monthsAgo": "{count, plural, =1{last month} other{{count} months ago}}",
+  "@monthsAgo": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "more": "More",
+  "moreActions": "More actions",
+  "namePlaceholder": "prod-web-01",
+  "nameRequired": "A name is required.",
+  "namesAndAddressesHidden": "Names and addresses hidden",
+  "navHome": "Home",
+  "navIdentities": "Identities",
+  "navManage": "Manage",
+  "navPortForward": "Port Forward",
+  "navServers": "Servers",
+  "navSessions": "Sessions",
+  "navSettings": "Settings",
+  "navSnippets": "Snippets",
+  "network": "Network",
+  "never": "Never",
+  "newFolder": "New Folder",
+  "newIdentity": "New Identity",
+  "newPortForward": "New Port Forward",
+  "newServer": "New Server",
+  "newSnippet": "New Snippet",
+  "newTerminal": "New Terminal",
+  "newTerminalShortcut": "New Terminal (Ctrl+Shift+T)",
+  "nice": "Nice",
+  "noAutoIdentity": "No identity is set to authenticate automatically. Choose an identity for this server.",
+  "noCredentials": "No credentials",
+  "noData": "No data",
+  "noFileOpen": "No file open",
+  "noFileOpenHelp": "Double-click a text file in Files, or open one by its path.",
+  "noIdentitiesYet": "No identities yet",
+  "noIdentityForUser": "No identity for {username} authenticates automatically. Add one under Identities.",
+  "@noIdentityForUser": {
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
+  "noMatches": "No matches",
+  "noPortForwards": "No port forwards",
+  "noPrivateKeyLoaded": "No private key loaded",
+  "noPublicKeyLoaded": "No public key loaded",
+  "noServer": "No server",
+  "noServersYet": "No servers yet",
+  "noSnippetsYet": "No snippets yet",
+  "noSwap": "No swap",
+  "noUsername": "No username",
+  "noWrapLines": "Don't Wrap Lines",
+  "none": "None",
+  "notAKeyFile": "This file does not look like a {kind} key",
+  "@notAKeyFile": {
+    "placeholders": {
+      "kind": {
+        "type": "String"
+      }
+    }
+  },
+  "notConnected": "Not connected",
+  "notUsedByAnyServer": "Not used by any server",
+  "now": "Now",
+  "numberToKeep": "Number to keep",
+  "ok": "OK",
+  "oneMinute": "1 min",
+  "openAction": "Open",
+  "openAnother": "Open Another",
+  "openEditor": "Open Editor",
+  "openFile": "Open File",
+  "openFileEllipsis": "Open File…",
+  "openFileShortcut": "Open File… (Ctrl+O)",
+  "openFiles": "Open Files",
+  "openIdentities": "Open Identities",
+  "openMonitor": "Open Monitor",
+  "openTerminal": "Open Terminal",
+  "openTerminals": "Open Terminals…",
+  "openTerminalsHelp": "Pick several servers and open a terminal on each",
+  "openTerminalsTitle": "Open Terminals",
+  "openingFile": "Opening {name}…",
+  "@openingFile": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "optional": "Optional",
+  "orientation": "Orientation",
+  "os": "OS",
+  "owner": "Owner",
+  "passphrase": "Passphrase",
+  "password": "Password",
+  "paste": "Paste",
+  "pathExample": "/etc/hosts",
+  "pathLabel": "Path",
+  "peakRate": "peak {rate}",
+  "@peakRate": {
+    "placeholders": {
+      "rate": {
+        "type": "String"
+      }
+    }
+  },
+  "permissions": "Permissions",
+  "plainKeyPair": "Plain Key Pair",
+  "plainPrivateKey": "Plain Private Key",
+  "port": "Port",
+  "portForwardTitle": "Port Forward",
+  "portForwardsStop": "Port forwards through it stop working.",
+  "portRange": "1–65535",
+  "privacy": "Privacy",
+  "privateKey": "Private key",
+  "privateKeyLower": "private",
+  "processes": "Processes",
+  "processor": "Processor",
+  "processorCores": "Processor · {count, plural, =1{1 core} other{{count} cores}}",
+  "@processorCores": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "publicKey": "Public key",
+  "publicKeyLower": "public",
+  "publicKeyOptional": "Public key (optional)",
+  "quickConnectHelp": "Type user@host, user@host:port or a full ssh command.",
+  "quickConnectHint": "user@host:22",
+  "quickConnectNoAutoIdentity": "Quick Connect signs in with identities set to “Authenticate automatically”. You have none yet.",
+  "quit": "Quit",
+  "ram": "RAM",
+  "receive": "Receive",
+  "recent": "Recent",
+  "recentSection": "Recent",
+  "reconnect": "Reconnect",
+  "reconnectTerminal": "Reconnect Terminal",
+  "reconnectingNote": "[i] Reconnecting with the details from when this session started.",
+  "reconnectingNoteHelp": "    If the server was edited, open a new terminal instead.",
+  "refresh": "Refresh",
+  "refreshHelp": "How often an open monitor reads the server.",
+  "reload": "Reload",
+  "reloadFromServer": "Reload {name} from the server?",
+  "@reloadFromServer": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "reloadFromServerAction": "Reload from Server",
+  "reloadShortcut": "Reload (Ctrl+R)",
+  "rememberRecentServers": "Remember recent servers",
+  "rememberRecentServersHelp": "Listed under Quick Connect on Home.",
+  "remoteForwardExplain": "Server :port → this computer → target",
+  "remoteForwardShort": "{server}:{bind} -localhost-> {host}:{port}",
+  "@remoteForwardShort": {
+    "placeholders": {
+      "bind": {
+        "type": "int"
+      },
+      "server": {
+        "type": "String"
+      },
+      "host": {
+        "type": "String"
+      },
+      "port": {
+        "type": "int"
+      }
+    }
+  },
+  "remove": "Remove",
+  "removeFromRecent": "Remove from Recent",
+  "removeFromTray": "Remove from Tray",
+  "rename": "Rename",
+  "renameEllipsis": "Rename…",
+  "renamingFile": "Renaming {name}...",
+  "@renamingFile": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "reportProblem": "Report a problem",
+  "required": "Required",
+  "restoreWindow": "Restore",
+  "revert": "Revert",
+  "run": "Run…",
+  "runAction": "Run",
+  "runName": "Run {name}",
+  "@runName": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "runningOfTotal": "/ {total} running",
+  "@runningOfTotal": {
+    "placeholders": {
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "save": "Save",
+  "saveAndStart": "Save and Start",
+  "saveShortcut": "Save (Ctrl+S)",
+  "saveWithoutConnecting": "Save the server without connecting",
+  "savedHostKeys": "Saved host keys",
+  "saving": "Saving…",
+  "search": "Search",
+  "searchForwards": "Search forwards",
+  "searchIdentities": "Search identities",
+  "searchServers": "Search servers",
+  "searchSnippets": "Search snippets",
+  "selectAll": "Select All",
+  "selectAllText": "Select All",
+  "selectIdentity": "Select an identity",
+  "selectIdentityFirst": "No identity that authenticates automatically could sign in. Choose an identity.",
+  "serverFallbackName": "Server",
+  "serverRefusedListen": "The server refused to listen on port {port}.",
+  "@serverRefusedListen": {
+    "placeholders": {
+      "port": {
+        "type": "int"
+      }
+    }
+  },
+  "serversNeedIdentity": "Servers need an identity set.",
+  "serversSection": "Servers",
+  "serversUsingCount": "{count, plural, =1{1 server} other{{count} servers}}",
+  "@serversUsingCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "sessionToolsOpen": "{tools} open",
+  "@sessionToolsOpen": {
+    "placeholders": {
+      "tools": {
+        "type": "String"
+      }
+    }
+  },
+  "sessionsSection": "Sessions",
+  "settingsShortcut": "Settings (Ctrl+,)",
+  "sftpNotConnected": "The file transfer session is not connected.",
+  "shortcutCloseTerminal": "Close terminal",
+  "shortcutCopy": "Copy",
+  "shortcutNewServer": "New server",
+  "shortcutNewTerminal": "New terminal on this server",
+  "shortcutPaste": "Paste",
+  "shortcutSettings": "Settings",
+  "shortcutSidebar": "Show or hide the sidebar",
+  "show": "Show",
+  "showAll": "Show All",
+  "showEverything": "Show Everything",
+  "showInTray": "Show in Tray",
+  "showSessionOnConnect": "Show a session when it connects",
+  "showSessionOnConnectHelp": "Switch to a terminal as soon as it opens.",
+  "showSidebar": "Show Sidebar (Ctrl+\\)",
+  "smallerText": "Smaller Text (Ctrl+-)",
+  "snippetNameHint": "Restart nginx",
+  "snippetNoCommand": "This snippet has no command to run.",
+  "snippetsTitle": "Snippets",
+  "sourceCode": "Source code",
+  "sourceOnGitHub": "Omicron0314/catussh on GitHub",
+  "ssh": "SSH",
+  "start": "Start",
+  "stop": "Stop",
+  "stopAll": "Stop All",
+  "stopAndClose": "Stop and Close",
+  "stopRunning": "Stop running {name}?",
+  "@stopRunning": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "storage": "Storage",
+  "storageEncrypted": "Servers, identities and snippets are encrypted (AES-256-GCM) in {path}; the key is kept in the system keyring.",
+  "@storageEncrypted": {
+    "placeholders": {
+      "path": {
+        "type": "String"
+      }
+    }
+  },
+  "summary": "Summary",
+  "swap": "Swap",
+  "syntaxHighlighting": "Syntax highlighting",
+  "system": "System",
+  "target": "Target",
+  "targetHost": "Target host",
+  "targetPort": "Target port",
+  "terminalAlreadyOpen": "{name} already has a terminal open",
+  "@terminalAlreadyOpen": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "terminalColorsUnder": "Terminal colors are set under Terminal.",
+  "terminalFallbackTitle": "Terminal",
+  "terminalOpen": "A terminal is open",
+  "terminalTab": "Terminal {number}",
+  "@terminalTab": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "text": "Text",
+  "textNotLoaded": "The text could not be loaded.",
+  "thisSnippet": "this snippet",
+  "through": "Through",
+  "toolEditor": "Editor",
+  "toolEditorHelp": "Edit text files on this server",
+  "toolFiles": "Files",
+  "toolFilesHelp": "Browse, upload and download files over SFTP",
+  "toolMonitor": "Monitor",
+  "toolMonitorHelp": "Watch CPU, memory, disk and network usage",
+  "toolTerminal": "Terminal",
+  "toolTerminalHelp": "Open an SSH terminal on this server",
+  "transfer": "Transfer",
+  "transferRunningWarning": "A transfer is still running and will be interrupted.",
+  "transmit": "Transmit",
+  "trayTooltipFigures": "CPU {cpu}%  Mem {memory}%",
+  "@trayTooltipFigures": {
+    "placeholders": {
+      "cpu": {
+        "type": "String"
+      },
+      "memory": {
+        "type": "String"
+      }
+    }
+  },
+  "trayTooltipRates": "↑ {transmit}  ↓ {receive}",
+  "@trayTooltipRates": {
+    "placeholders": {
+      "transmit": {
+        "type": "String"
+      },
+      "receive": {
+        "type": "String"
+      }
+    }
+  },
+  "tryAgain": "Try Again",
+  "tryingIdentity": "[i] trying to authenticate with {identity}",
+  "@tryingIdentity": {
+    "placeholders": {
+      "identity": {
+        "type": "String"
+      }
+    }
+  },
+  "unableToConnectOrAuth": "Unable to connect or authenticate ({error})",
+  "@unableToConnectOrAuth": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "unableToConnectShort": "Unable to connect for {host}:{port}",
+  "@unableToConnectShort": {
+    "placeholders": {
+      "host": {
+        "type": "String"
+      },
+      "port": {
+        "type": "int"
+      }
+    }
+  },
+  "unableToConnectTo": "Unable to connect for {host}:{port} ({error})",
+  "@unableToConnectTo": {
+    "placeholders": {
+      "host": {
+        "type": "String"
+      },
+      "port": {
+        "type": "int"
+      },
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "unknown": "Unknown",
+  "unknownError": "Unknown Error",
+  "unknownKey": "Unknown Key",
+  "unknownServer": "Unknown server",
+  "unsavedChangesLost": "Unsaved changes are lost.",
+  "unsavedFilesWarning": "Files open in the editor have changes that are not saved. They are lost if you close.",
+  "unsavedInEditor": "Unsaved changes in the editor will be lost.",
+  "untitled": "Untitled",
+  "untitledFolder": "untitled folder",
+  "upload": "Upload",
+  "uploadCancelled": "Upload cancelled",
+  "uploadComplete": "Upload complete",
+  "uploadFailed": "Upload failed: {error}",
+  "@uploadFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "uptime": "Uptime",
+  "useDesktopAccent": "Use the desktop accent color",
+  "useDesktopAccentHelp": "Material You: colors follow your desktop theme when it provides an accent.",
+  "used": "Used",
+  "usedBy": "Used by {names}",
+  "@usedBy": {
+    "placeholders": {
+      "names": {
+        "type": "String"
+      }
+    }
+  },
+  "usedByMore": "Used by {names} and {count} more",
+  "@usedByMore": {
+    "placeholders": {
+      "names": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "usedOfSize": "{used} of {size}",
+  "@usedOfSize": {
+    "placeholders": {
+      "used": {
+        "type": "String"
+      },
+      "size": {
+        "type": "String"
+      }
+    }
+  },
+  "user": "User",
+  "usernameOnly": "Username Only",
+  "usernamePlaceholder": "root",
+  "vaultKeyMissing": "The key that opens your saved servers is missing from the system keyring.",
+  "vaultKeyringUnavailable": "The system keyring (Secret Service) could not be reached, so servers and identities are kept for this run only.",
+  "version": "Version",
+  "versionLine": "{version} ({build}) · Linux",
+  "@versionLine": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      },
+      "build": {
+        "type": "String"
+      }
+    }
+  },
+  "vram": "VRAM",
+  "weeksAgo": "{count, plural, =1{last week} other{{count} weeks ago}}",
+  "@weeksAgo": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "welcome": "Welcome to catussh",
+  "whereKept": "Where your servers are kept",
+  "wrapLines": "Wrap Lines",
+  "yearsAgo": "{count, plural, =1{last year} other{{count} years ago}}",
+  "@yearsAgo": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "yourChangesLost": "Your changes are lost if you don't save them."
+}

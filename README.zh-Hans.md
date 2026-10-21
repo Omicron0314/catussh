@@ -4,7 +4,7 @@
 
 为管理 Linux 和 macOS 服务器而生的 SSH 客户端，用 Flutter + Material You 重写：SSH 终端、
 SFTP 文件传输（含文本编辑器）、实时资源监控，每台服务器并排可用。先做 Linux 桌面，
-之后是 Android。
+之后是 Android。界面支持英文和简体中文，跟随系统语言。
 
 [![License](https://img.shields.io/badge/license-MIT-blue)](./LICENSE)
 ![Platform](https://img.shields.io/badge/platform-Linux-lightgrey)
@@ -44,6 +44,10 @@ bash Workflow/install-linux.sh        # Release 构建，安装到 ~/.local/opt/
   跑得多快取决于 CPU 占用。
 - **校验主机密钥**：首次连接时保存，之后密钥变了就拒绝连接。
 - 服务器、身份和片段加密存储（AES-256-GCM），密钥放在系统密钥环里。
+- **Material You**：配色取自桌面强调色（也可以自选），支持浅色、深色和跟随系统；
+  窗口标题栏（拖动、最小化、最大化、关闭）由应用自己用这套颜色绘制，不再用系统的。
+- **中英文界面**：默认跟随系统语言，可在 设置 › 通用 › 语言 中切换。日期和“几分钟前”
+  这类相对时间也会跟着变；服务器名称、路径和终端内容保持原样。
 
 ## 截图
 
@@ -52,6 +56,7 @@ bash Workflow/install-linux.sh        # Release 构建，安装到 ~/.local/opt/
 | ![服务器](./Resources/Screenshots/servers-light.webp) | ![监控](./Resources/Screenshots/monitor-dark.webp) |
 | ![终端](./Resources/Screenshots/terminal-dark.webp) | ![文件](./Resources/Screenshots/files-light.webp) |
 | ![身份](./Resources/Screenshots/identities-light.webp) | ![终端设置](./Resources/Screenshots/settings-dark.webp) |
+| ![中文主页](./Resources/Screenshots/home-light-zh.webp) | ![中文设置](./Resources/Screenshots/settings-dark-zh.webp) |
 
 ## 快捷键
 
@@ -81,7 +86,13 @@ CATUSSH_SHOTS=/tmp/shots flutter test test/tool/screenshots_test.dart   # 渲染
 ```
 
 `CATUSSH_DATA_DIR=/tmp/profile` 用单独的配置目录运行，密钥存在文件里（不要用于真实数据）；
-`CATUSSH_OPEN=monitor:<服务器名>` 启动时直接打开某台服务器的工具。
+`CATUSSH_OPEN=monitor:<服务器名>` 启动时直接打开某台服务器的工具。截图由
+`test/tool/screenshots_test.dart` 渲染（设置 `CATUSSH_SHOTS`；需要 `python3` 和
+`fontTools`，用来从系统 Noto 字体集里取出一个中文字面）。
+
+窗口特意不带系统装饰：`linux/runner/my_application.cc` 关掉了 GTK 标题栏，
+`lib/features/shell/title_bar.dart` 自己绘制拖动区域和三个窗口按钮。平铺窗口管理器里
+窗口大小由布局决定；浮动时用合成器自己的鼠标绑定调整大小。
 
 ## 许可
 

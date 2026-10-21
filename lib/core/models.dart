@@ -6,6 +6,7 @@
 import 'package:uuid/uuid.dart';
 
 import 'ssh_command_reader.dart';
+import 'strings.dart';
 
 const _uuid = Uuid();
 
@@ -163,21 +164,21 @@ class Identity {
 
   String getKeyType() {
     if (privateKey.isNotEmpty && publicKey.isNotEmpty) {
-      return password.isNotEmpty ? 'Key Pair' : 'Plain Key Pair';
+      return password.isNotEmpty ? S.l.keyTypeKeyPair : S.l.keyTypePlainKeyPair;
     } else if (privateKey.isNotEmpty) {
-      return password.isNotEmpty ? 'Private Key' : 'Plain Private Key';
+      return password.isNotEmpty ? S.l.keyTypePrivateKey : S.l.keyTypePlainPrivateKey;
     } else if (publicKey.isNotEmpty) {
-      return 'Unknown Key';
+      return S.l.unknownKey;
     } else if (password.isNotEmpty) {
-      return 'Password';
+      return S.l.password;
     }
-    return 'Username Only';
+    return S.l.usernameOnly;
   }
 
   String shortDescription() {
-    if (username.isEmpty) return 'Unknown Error';
-    var build = 'User $username with ${getKeyType()}';
-    if (group.isNotEmpty) build += ' Group<$group>';
+    if (username.isEmpty) return S.l.unknownError;
+    var build = S.l.identityShort(username, getKeyType());
+    if (group.isNotEmpty) build += ' ${S.l.identityGroup(group)}';
     if (comment.isNotEmpty) build += ' ($comment)';
     return build;
   }
@@ -186,10 +187,10 @@ class Identity {
   String get authDescription {
     if (privateKey.isNotEmpty) {
       final type = keyAlgorithm;
-      return type == null ? 'Key pair' : 'Key pair · $type';
+      return type == null ? S.l.keyPair : '${S.l.keyPair} · $type';
     }
-    if (password.isNotEmpty) return 'Password';
-    return 'No credentials';
+    if (password.isNotEmpty) return S.l.password;
+    return S.l.noCredentials;
   }
 
   String? get keyAlgorithm {
@@ -339,13 +340,13 @@ class PortForward {
       machine.isNotPlaceholder();
 
   String shortDescription(Machine? machine) {
-    if (!isValid(machine)) return 'Invalid Forward';
+    if (!isValid(machine)) return S.l.invalidForward;
     final name = machine!.name;
     return switch (forwardOrientation) {
       ForwardOrientation.listenLocal =>
-        'localhost:$bindPort -$name-> $targetHost:$targetPort',
+        S.l.localForwardShort(bindPort, name, targetHost, targetPort),
       ForwardOrientation.listenRemote =>
-        '$name:$bindPort -localhost-> $targetHost:$targetPort',
+        S.l.remoteForwardShort(bindPort, name, targetHost, targetPort),
     };
   }
 

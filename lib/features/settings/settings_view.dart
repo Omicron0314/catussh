@@ -11,15 +11,16 @@ import 'package:xterm/xterm.dart';
 
 import '../../app/router.dart';
 import '../../core/store.dart';
+import '../../core/strings.dart';
 import '../../ui/theme.dart';
 import '../../ui/widgets.dart';
 import 'agreement.dart';
 
-const _categories = [
-  ('general', 'General', Icons.tune),
-  ('terminal', 'Terminal', Icons.terminal),
-  ('connection', 'Connection', Icons.lan_outlined),
-  ('about', 'About', Icons.info_outline),
+List<(String, String, IconData)> get _categories => [
+  ('general', S.l.general, Icons.tune),
+  ('terminal', S.l.toolTerminal, Icons.terminal),
+  ('connection', S.l.connection, Icons.lan_outlined),
+  ('about', S.l.about, Icons.info_outline),
 ];
 
 class SettingsView extends StatelessWidget {
@@ -198,31 +199,53 @@ class _GeneralSettings extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        _Section('Appearance', [
+        _Section(S.l.language, [
+          ListTile(
+            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+            title: Text(S.l.language),
+            subtitle: Text(S.l.languageHelp),
+            trailing: DropdownButton<String>(
+              value: store.locale,
+              underline: const SizedBox(),
+              borderRadius: BorderRadius.circular(12),
+              items: [
+                DropdownMenuItem(value: 'system', child: Text(S.l.followSystem)),
+                DropdownMenuItem(value: 'en', child: Text(S.l.english)),
+                DropdownMenuItem(value: 'zh', child: Text(S.l.chineseSimplified)),
+              ],
+              onChanged: (v) {
+                if (v == null) return;
+                // The interface is rebuilt in the new locale straight away.
+                store.update((s) => s.locale = v);
+              },
+            ),
+          ),
+        ]),
+        _Section(S.l.appearance, [
           _Row(
-            'Light or dark',
-            description: 'Terminal colors are set under Terminal.',
+            S.l.lightOrDark,
+            description: S.l.terminalColorsUnder,
             trailing: SegmentedButton<ThemeMode>(
-              segments: const [
-                ButtonSegment(value: ThemeMode.system, label: Text('System')),
-                ButtonSegment(value: ThemeMode.light, label: Text('Light')),
-                ButtonSegment(value: ThemeMode.dark, label: Text('Dark')),
+              segments: [
+                ButtonSegment(value: ThemeMode.system, label: Text(S.l.system)),
+                ButtonSegment(value: ThemeMode.light, label: Text(S.l.light)),
+                ButtonSegment(value: ThemeMode.dark, label: Text(S.l.dark)),
               ],
               selected: {store.appearance},
               onSelectionChanged: (s) => store.update((st) => st.appearance = s.first),
             ),
           ),
           _Switch(
-            'Use the desktop accent color',
-            description: 'Material You: colors follow your desktop theme when it provides an accent.',
+            S.l.useDesktopAccent,
+            description: S.l.useDesktopAccentHelp,
             value: store.dynamicColor,
             onChanged: (v) => store.update((s) => s.dynamicColor = v),
           ),
           ListTile(
             enabled: !store.dynamicColor,
             contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-            title: const Text('Accent color'),
-            subtitle: const Text('Used when the desktop accent is off or unavailable.'),
+            title: Text(S.l.accentColor),
+            subtitle: Text(S.l.accentColorHelp),
             trailing: Wrap(spacing: 6, children: [
               for (final c in _seeds)
                 InkWell(
@@ -247,29 +270,29 @@ class _GeneralSettings extends StatelessWidget {
             ]),
           ),
         ]),
-        _Section('Sessions', [
+        _Section(S.l.sessionsSection, [
           _Switch(
-            'Show a session when it connects',
-            description: 'Switch to a terminal as soon as it opens.',
+            S.l.showSessionOnConnect,
+            description: S.l.showSessionOnConnectHelp,
             value: store.openInterfaceAutomatically,
             onChanged: (v) => store.update((s) => s.openInterfaceAutomatically = v),
           ),
           _Switch(
-            'Ask before closing a session',
-            description: 'Confirm before closing a connected terminal or deleting.',
+            S.l.askBeforeClosing,
+            description: S.l.askBeforeClosingHelp,
             value: !store.disableConformation,
             onChanged: (v) => store.update((s) => s.disableConformation = !v),
           ),
         ]),
-        _Section('Recent', [
+        _Section(S.l.recentSection, [
           _Switch(
-            'Remember recent servers',
-            description: 'Listed under Quick Connect on Home.',
+            S.l.rememberRecentServers,
+            description: S.l.rememberRecentServersHelp,
             value: store.storeRecent,
             onChanged: (v) => store.update((s) => s.storeRecent = v),
           ),
           _Row(
-            'Number to keep',
+            S.l.numberToKeep,
             trailing: _Stepper(
               value: store.maxRecentRecordCount,
               min: 1,
@@ -283,8 +306,8 @@ class _GeneralSettings extends StatelessWidget {
             ),
           ),
           _Switch(
-            'Include Quick Connect commands',
-            description: 'Also remember user@host commands typed on Home.',
+            S.l.includeQuickConnect,
+            description: S.l.includeQuickConnectHelp,
             value: store.saveTemporarySession,
             onChanged: store.storeRecent ? (v) => store.update((s) => s.saveTemporarySession = v) : null,
           ),
@@ -367,10 +390,10 @@ class _TerminalSettingsState extends State<_TerminalSettings> {
             ),
           ),
         ),
-        _Section('Text', [
+        _Section(S.l.text, [
           _Row(
-            'Font',
-            description: 'Installed monospace fonts.',
+            S.l.font,
+            description: S.l.fontHelp,
             trailing: DropdownButton<String>(
               value: store.terminalFontFamily,
               underline: const SizedBox(),
@@ -383,8 +406,8 @@ class _TerminalSettingsState extends State<_TerminalSettings> {
             ),
           ),
           _Row(
-            'Size',
-            description: 'Ctrl+= and Ctrl+- change it in a terminal.',
+            S.l.fontSize,
+            description: S.l.fontSizeHelp,
             trailing: _Stepper(
               value: store.terminalFontSize,
               min: 4,
@@ -394,27 +417,27 @@ class _TerminalSettingsState extends State<_TerminalSettings> {
             ),
           ),
         ]),
-        _Section('Colors', [
+        _Section(S.l.colors, [
           Padding(
             padding: const EdgeInsets.all(RX.s4),
             child: Wrap(
               spacing: RX.s3,
               runSpacing: RX.s3,
               children: [
-                _ThemeSwatch(id: 'material', title: 'Material You', theme: materialTerminalTheme(scheme)),
+                _ThemeSwatch(id: 'material', title: S.l.materialYou, theme: materialTerminalTheme(scheme)),
                 for (final t in terminalThemes) _ThemeSwatch(id: t.id, title: t.title, theme: t.theme),
               ],
             ),
           ),
         ]),
-        _Section('Keyboard', const [
-          _Row('Copy', trailing: Text('Ctrl+Shift+C')),
-          _Row('Paste', trailing: Text('Ctrl+V')),
-          _Row('New terminal on this server', trailing: Text('Ctrl+Shift+T')),
-          _Row('Close terminal', trailing: Text('Ctrl+Shift+W')),
-          _Row('Settings', trailing: Text('Ctrl+,')),
-          _Row('New server', trailing: Text('Ctrl+Shift+N')),
-          _Row('Show or hide the sidebar', trailing: Text('Ctrl+\\')),
+        _Section(S.l.keyboard, [
+          _Row(S.l.shortcutCopy, trailing: const Text('Ctrl+Shift+C')),
+          _Row(S.l.shortcutPaste, trailing: const Text('Ctrl+V')),
+          _Row(S.l.shortcutNewTerminal, trailing: const Text('Ctrl+Shift+T')),
+          _Row(S.l.shortcutCloseTerminal, trailing: const Text('Ctrl+Shift+W')),
+          _Row(S.l.shortcutSettings, trailing: const Text('Ctrl+,')),
+          _Row(S.l.shortcutNewServer, trailing: const Text('Ctrl+Shift+N')),
+          _Row(S.l.shortcutSidebar, trailing: const Text('Ctrl+\\')),
         ]),
       ],
     );
@@ -470,10 +493,10 @@ class _ConnectionSettings extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        _Section('SSH', [
+        _Section(S.l.ssh, [
           _Row(
-            'Connection timeout',
-            description: 'How long to wait for a server before giving up.',
+            S.l.connectionTimeout,
+            description: S.l.connectionTimeoutHelp,
             trailing: _Stepper(
               value: store.timeout,
               min: 2,
@@ -483,45 +506,43 @@ class _ConnectionSettings extends StatelessWidget {
             ),
           ),
           _Row(
-            'Saved host keys',
-            description:
-                "A server's key is saved the first time you connect; a server that later presents another key is refused. $count saved.",
+            S.l.savedHostKeys,
+            description: S.l.hostKeysSaved(count),
             trailing: OutlinedButton(
               onPressed: count == 0
                   ? null
                   : () async {
                       final ok = await requiresConfirmation(
                         context,
-                        message: 'Forget all saved host keys?',
-                        informative: 'The key each server presents on its next connection is saved as its key.',
-                        confirmTitle: 'Forget All',
+                        message: S.l.forgetAllHostKeys,
+                        informative: S.l.forgetAllHostKeysHelp,
+                        confirmTitle: S.l.forgetAllAction,
                       );
                       if (ok) store.update((s) => s.knownHosts.forgetAll());
                     },
-              child: const Text('Forget All…'),
+              child: Text(S.l.forgetAll),
             ),
           ),
         ]),
-        _Section('Monitor', [
+        _Section(S.l.monitor, [
           _Row(
-            'Refresh',
-            description: 'How often an open monitor reads the server.',
+            S.l.refresh,
+            description: S.l.refreshHelp,
             trailing: DropdownButton<int>(
               value: interval,
               underline: const SizedBox(),
               borderRadius: BorderRadius.circular(12),
               items: [
-                for (final s in {...intervals, interval}) DropdownMenuItem(value: s, child: Text('Every $s s')),
+                for (final s in {...intervals, interval}) DropdownMenuItem(value: s, child: Text(S.l.everySeconds(s))),
               ],
               onChanged: (v) => v == null ? null : store.update((s) => s.monitorInterval = v),
             ),
           ),
         ]),
-        _Section('Storage', [
+        _Section(S.l.storage, [
           _Row(
-            'Where your servers are kept',
-            description: store.vault.problem ??
-                'Servers, identities and snippets are encrypted (AES-256-GCM) in ${store.vault.directory.path}; the key is kept in the system keyring.',
+            S.l.whereKept,
+            description: store.vault.problem ?? S.l.storageEncrypted(store.vault.directory.path),
             trailing: const SizedBox(),
           ),
         ]),
@@ -547,15 +568,15 @@ class _AboutSettings extends StatelessWidget {
             const SizedBox(width: RX.s4),
             Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Text('catussh', style: Theme.of(context).textTheme.headlineSmall),
-              const Text('SSH terminal, files and monitor for your servers.'),
+              Text(S.l.appTagline),
             ]),
           ]),
         ),
         _Section('catussh', [
-          const _Row('Version', trailing: SelectableText('3.0.0 (Flutter) · Linux')),
+          _Row(S.l.version, trailing: SelectableText(S.l.versionLine('3.0.0', '50'))),
           _Row(
-            'Source code',
-            description: 'Omicron0314/catussh on GitHub',
+            S.l.sourceCode,
+            description: S.l.sourceOnGitHub,
             trailing: OutlinedButton.icon(
               onPressed: () => launchUrl(Uri.parse('https://github.com/Omicron0314/catussh')),
               icon: const Icon(Icons.open_in_new, size: 16),
@@ -563,25 +584,25 @@ class _AboutSettings extends StatelessWidget {
             ),
           ),
           _Row(
-            'Report a problem',
-            description: "Bugs and ideas go to the project's issue tracker.",
+            S.l.reportProblem,
+            description: S.l.issuesHelp,
             trailing: OutlinedButton.icon(
               onPressed: () => launchUrl(Uri.parse('https://github.com/Omicron0314/catussh/issues')),
               icon: const Icon(Icons.open_in_new, size: 16),
-              label: const Text('Issues'),
+              label: Text(S.l.issues),
             ),
           ),
           _Row(
-            'Legal',
+            S.l.legal,
             trailing: Wrap(spacing: RX.s2, children: [
-              OutlinedButton(onPressed: () => showDocument(context, AboutDocument.license), child: const Text('License…')),
-              OutlinedButton(onPressed: () => showDocument(context, AboutDocument.agreement), child: const Text('Agreement…')),
+              OutlinedButton(onPressed: () => showDocument(context, AboutDocument.license), child: Text(S.l.licenseEllipsis)),
+              OutlinedButton(onPressed: () => showDocument(context, AboutDocument.agreement), child: Text(S.l.agreementEllipsis)),
             ]),
           ),
         ]),
-        const _Section('Acknowledgements', [
-          _Row('Based on', description: 'catussh by mizorewww, the continuation of Rayon by Lakr Aream (@Lakr233) and contributors. This version is not affiliated with or endorsed by them.', trailing: SizedBox()),
-          _Row('Libraries', description: 'Flutter · dartssh2 · xterm.dart · re_editor · dynamic_color · tray_manager · cryptography', trailing: SizedBox()),
+        _Section(S.l.acknowledgements, [
+          _Row(S.l.basedOn, description: S.l.basedOnText, trailing: const SizedBox()),
+          _Row(S.l.libraries, description: S.l.librariesText, trailing: const SizedBox()),
         ]),
       ],
     );

@@ -7,6 +7,7 @@ import 'package:dartssh2/dartssh2.dart';
 import 'package:flutter/foundation.dart';
 import 'package:xterm/xterm.dart';
 
+import '../core/strings.dart';
 import '../core/models.dart';
 import '../core/store.dart';
 import '../ssh/connection.dart';
@@ -41,7 +42,7 @@ class BatchExec extends ChangeNotifier {
       final terminal = Terminal(maxLines: 10000);
       outputs[id] = terminal;
       if (machine == null) {
-        terminal.write('\r\n[*] Malformed Machine Info\r\n');
+        terminal.write('\r\n${S.l.malformedMachineInfo}\r\n');
         states[id] = const RunFailed(Duration.zero);
         continue;
       }
@@ -91,7 +92,7 @@ class BatchExec extends ChangeNotifier {
         throw const _Stopped();
       }
       _connections[machine.id] = connection;
-      out.write('[*] Execute Begin\r\n');
+      out.write('${S.l.execBegin}\r\n');
       final session = await connection.client.execute(snippet.code);
       _sessions[machine.id] = session;
       const decoder = Utf8Decoder(allowMalformed: true);
@@ -107,9 +108,9 @@ class BatchExec extends ChangeNotifier {
       await done.future;
       await session.done;
       if (_stopped) throw const _Stopped();
-      out.write('\r\n[*] Execution completed\r\n');
+      out.write('\r\n${S.l.execCompleted}\r\n');
     } on _Stopped {
-      out.write('\r\n[*] Stopped\r\n');
+      out.write('\r\n${S.l.execStopped}\r\n');
       failed = true;
     } on ConnectFailure catch (failure) {
       out.write(failure.authentication

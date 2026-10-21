@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import '../core/models.dart';
 import '../core/ssh_command_reader.dart';
 import '../core/store.dart';
+import '../core/strings.dart';
 import '../sessions/editor_workspace.dart';
 import '../sessions/file_transfer_session.dart';
 import '../sessions/monitor_session.dart';
@@ -19,15 +20,27 @@ enum Place { home, servers, identities, snippets, portForward, settings }
 /// names, icons and descriptions, so a button means the same thing wherever
 /// it appears.
 enum ServerTool {
-  terminal('Terminal', Icons.terminal, 'Open an SSH terminal on this server'),
-  files('Files', Icons.folder_outlined, 'Browse, upload and download files over SFTP'),
-  editor('Editor', Icons.edit_note, 'Edit text files on this server'),
-  monitor('Monitor', Icons.speed, 'Watch CPU, memory, disk and network usage');
+  terminal(Icons.terminal),
+  files(Icons.folder_outlined),
+  editor(Icons.edit_note),
+  monitor(Icons.speed);
 
-  const ServerTool(this.title, this.icon, this.help);
-  final String title;
+  const ServerTool(this.icon);
   final IconData icon;
-  final String help;
+
+  String get title => switch (this) {
+        terminal => S.l.toolTerminal,
+        files => S.l.toolFiles,
+        editor => S.l.toolEditor,
+        monitor => S.l.toolMonitor,
+      };
+
+  String get help => switch (this) {
+        terminal => S.l.toolTerminalHelp,
+        files => S.l.toolFilesHelp,
+        editor => S.l.toolEditorHelp,
+        monitor => S.l.toolMonitorHelp,
+      };
 }
 
 sealed class Route {

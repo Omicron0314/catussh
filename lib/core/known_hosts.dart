@@ -10,6 +10,8 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'strings.dart';
+
 class HostKey {
   const HostKey(this.type, this.fingerprint);
 
@@ -119,10 +121,10 @@ class KnownHosts {
     if (offered == null) return null;
     final saved = savedKey(host, port);
     return [
-      'The host key of $host:$port has changed, so the connection was refused.',
-      if (saved != null) 'Saved: ${saved.type} ${saved.fingerprint}',
-      'Offered: ${offered.type} ${offered.fingerprint}',
-      'If the server was reinstalled or its keys were replaced, choose Forget Host Key for it and connect again. If not, something may be intercepting the connection.',
+      S.l.hostKeyChanged(host, port),
+      if (saved != null) S.l.hostKeySaved(saved.type, saved.fingerprint),
+      S.l.hostKeyOffered(offered.type, offered.fingerprint),
+      S.l.hostKeyChangedHelp,
     ].join('\n');
   }
 }

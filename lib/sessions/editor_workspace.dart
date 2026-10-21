@@ -6,6 +6,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:re_editor/re_editor.dart';
 
+import '../core/strings.dart';
 import '../core/models.dart';
 import 'editor_language.dart';
 import 'file_transfer_session.dart';
@@ -90,7 +91,7 @@ class EditorDocument extends ChangeNotifier {
       isEdited = controller.text != snapshot;
       return null;
     } catch (error) {
-      return "Couldn't save $name. $error";
+      return S.l.couldNotSave(name, '$error');
     } finally {
       saving = false;
       _notify();
@@ -104,7 +105,7 @@ class EditorDocument extends ChangeNotifier {
         DateTime.now().isBefore(deadline)) {
       await Future<void>.delayed(const Duration(milliseconds: 100));
     }
-    if (!_transfer.connected) throw Exception('The file transfer session is not connected.');
+    if (!_transfer.connected) throw Exception(S.l.sftpNotConnected);
   }
 
   @override

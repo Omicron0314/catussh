@@ -7,6 +7,7 @@ import 'dart:io';
 import 'package:dartssh2/dartssh2.dart';
 import 'package:flutter/foundation.dart';
 
+import '../core/strings.dart';
 import '../core/models.dart';
 import '../ssh/connection.dart';
 
@@ -125,7 +126,7 @@ class PortForwardSession extends ChangeNotifier {
   /// `ssh -R`: the server listens, this computer dials the target.
   Future<void> _runRemote(SshConnection connection) async {
     final remote = await connection.client.forwardRemote(port: info.bindPort);
-    if (remote == null) throw Exception('The server refused to listen on port ${info.bindPort}.');
+    if (remote == null) throw Exception(S.l.serverRefusedListen(info.bindPort));
     _remote = remote;
     _put(ForwardLifecycle.forwardRunning);
     final serving = remote.connections.listen((channel) async {

@@ -5,6 +5,7 @@
 An SSH client for the Linux and macOS servers you look after, rebuilt in Flutter with
 Material You: an SSH terminal, SFTP file transfer with a text editor, and a live
 resource monitor, side by side for every server. Linux desktop first; Android next.
+English and Simplified Chinese, following the system language.
 
 [![License](https://img.shields.io/badge/license-MIT-blue)](./LICENSE)
 ![Platform](https://img.shields.io/badge/platform-Linux-lightgrey)
@@ -46,6 +47,12 @@ bash Workflow/install-linux.sh        # release build into ~/.local/opt/catussh
   key is refused.
 - Servers, identities and snippets are stored encrypted (AES-256-GCM); the key lives in
   the system keyring.
+- **Material You**: colors come from the desktop accent (or a seed color you pick), light,
+  dark or system; the window's own title bar (drag, minimize, maximize, close) is drawn in
+  those colors instead of the system's.
+- **English and 简体中文**: the interface follows the system language; Settings › General ›
+  Language changes it. Dates and relative times follow too; server names, paths and
+  terminal output are left as they are.
 
 ## Screenshots
 
@@ -54,6 +61,7 @@ bash Workflow/install-linux.sh        # release build into ~/.local/opt/catussh
 | ![Servers](./Resources/Screenshots/servers-light.webp) | ![Monitor](./Resources/Screenshots/monitor-dark.webp) |
 | ![Terminal](./Resources/Screenshots/terminal-dark.webp) | ![Files](./Resources/Screenshots/files-light.webp) |
 | ![Identities](./Resources/Screenshots/identities-light.webp) | ![Terminal settings](./Resources/Screenshots/settings-dark.webp) |
+| ![Home in Chinese](./Resources/Screenshots/home-light-zh.webp) | ![Settings in Chinese](./Resources/Screenshots/settings-dark-zh.webp) |
 
 ## Keyboard
 
@@ -84,7 +92,14 @@ CATUSSH_SHOTS=/tmp/shots flutter test test/tool/screenshots_test.dart   # render
 
 `CATUSSH_DATA_DIR=/tmp/profile` runs the app on a separate profile whose key is kept in a
 file (never use it for real data); `CATUSSH_OPEN=monitor:<server name>` opens a server's
-tool at launch.
+tool at launch. The screenshots are rendered by `test/tool/screenshots_test.dart` with
+`CATUSSH_SHOTS` (it needs `python3` with `fontTools` to take a CJK face out of the system
+Noto collection).
+
+The window is undecorated on purpose: `linux/runner/my_application.cc` turns the GTK title
+bar off and `lib/features/shell/title_bar.dart` draws the drag area and the three window
+buttons. On a tiling compositor the window is sized by the layout; when floating, resize
+it with the compositor's own mouse bindings.
 
 Layout: `lib/core` (models, store, vault, known hosts, `ssh` command parser),
 `lib/ssh` (connecting and signing in), `lib/monitor` (the monitor script and parsers),

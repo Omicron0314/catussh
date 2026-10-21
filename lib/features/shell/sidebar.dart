@@ -8,13 +8,13 @@ import 'package:provider/provider.dart';
 import '../../app/router.dart';
 import '../../core/models.dart';
 import '../../core/store.dart';
+import '../../core/strings.dart';
 import '../../sessions/terminal_session.dart';
 import '../../ui/theme.dart';
 import '../../ui/widgets.dart';
 
 class Sidebar extends StatelessWidget {
-  const Sidebar({super.key, required this.onHide});
-  final VoidCallback onHide;
+  const Sidebar({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -49,11 +49,6 @@ class Sidebar extends StatelessWidget {
                 const SizedBox(width: 10),
                 Text('catussh', style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600)),
                 const Spacer(),
-                IconButton(
-                  tooltip: 'Hide Sidebar (Ctrl+\\)',
-                  icon: const Icon(Icons.view_sidebar_outlined, size: 20),
-                  onPressed: onHide,
-                ),
               ],
             ),
           ),
@@ -61,15 +56,15 @@ class Sidebar extends StatelessWidget {
             child: ListView(
               padding: const EdgeInsets.symmetric(horizontal: 12),
               children: [
-                place(Place.home, 'Home', Icons.home_outlined, Icons.home),
-                const _SidebarHeader('Manage'),
-                place(Place.servers, 'Servers', Icons.dns_outlined, Icons.dns, badge: store.machines.length),
-                place(Place.identities, 'Identities', Icons.badge_outlined, Icons.badge, badge: store.identities.length),
-                place(Place.snippets, 'Snippets', Icons.code, Icons.code, badge: store.snippets.length),
-                place(Place.portForward, 'Port Forward', Icons.swap_horiz, Icons.swap_horiz,
+                place(Place.home, S.l.navHome, Icons.home_outlined, Icons.home),
+                _SidebarHeader(S.l.navManage),
+                place(Place.servers, S.l.navServers, Icons.dns_outlined, Icons.dns, badge: store.machines.length),
+                place(Place.identities, S.l.navIdentities, Icons.badge_outlined, Icons.badge, badge: store.identities.length),
+                place(Place.snippets, S.l.navSnippets, Icons.code, Icons.code, badge: store.snippets.length),
+                place(Place.portForward, S.l.navPortForward, Icons.swap_horiz, Icons.swap_horiz,
                     badge: store.portForwards.length),
                 if (owners.isNotEmpty) ...[
-                  const _SidebarHeader('Sessions'),
+                  _SidebarHeader(S.l.navSessions),
                   for (final owner in owners)
                     _OwnerRow(owner: owner, selected: owner == selectedOwner),
                 ],
@@ -79,8 +74,8 @@ class Sidebar extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.fromLTRB(12, 4, 12, 16),
             child: Tooltip(
-              message: 'Settings (Ctrl+,)',
-              child: place(Place.settings, 'Settings', Icons.settings_outlined, Icons.settings),
+              message: S.l.settingsShortcut,
+              child: place(Place.settings, S.l.navSettings, Icons.settings_outlined, Icons.settings),
             ),
           ),
         ],
@@ -198,13 +193,13 @@ class _OwnerRow extends StatelessWidget {
         title = store.machine(machineId)?.name ?? _sessionMachineName(router, machineId);
         icon = Icons.dns_outlined;
       case CommandOwner(:final terminalId):
-        title = router.terminals.where((t) => t.id == terminalId).firstOrNull?.displayName ?? 'Terminal';
+        title = router.terminals.where((t) => t.id == terminalId).firstOrNull?.displayName ?? S.l.terminalFallbackTitle;
         icon = Icons.terminal;
     }
     final openTools = ServerTool.values.where((tool) => routes.any((r) => r.tool == tool)).toList();
 
     return Tooltip(
-      message: '${openTools.map((t) => t.title).join(', ')} open',
+      message: S.l.sessionToolsOpen(openTools.map((t) => t.title).join(', ')),
       waitDuration: const Duration(seconds: 1),
       child: _SidebarRow(
         selected: selected,
@@ -235,7 +230,7 @@ class _OwnerRow extends StatelessWidget {
     for (final m in router.monitors) {
       if (m.machine.id == machineId) return m.machine.name;
     }
-    return 'Server';
+    return S.l.serverFallbackName;
   }
 
   Future<void> _menu(
@@ -251,19 +246,19 @@ class _OwnerRow extends StatelessWidget {
         case ServerTool.terminal:
           final t = router.terminals.where((t) => t.id == r.id).firstOrNull;
           if (t == null) continue;
-          if (t.closed) items.add(menuItem('Reconnect Terminal', Icons.refresh, t.reconnect));
-          items.add(menuItem('Close Terminal', Icons.close, () => closeTerminalAsking(context, t)));
+          if (t.closed) items.add(menuItem(S.l.reconnectTerminal, Icons.refresh, t.reconnect));
+          items.add(menuItem(S.l.closeTerminal, Icons.close, () => closeTerminalAsking(context, t)));
         case ServerTool.files:
-          items.add(menuItem('Close Files', Icons.close, () => router.closeRoute(r)));
+          items.add(menuItem(S.l.closeFiles, Icons.close, () => router.closeRoute(r)));
         case ServerTool.editor:
-          items.add(menuItem('Close Editor', Icons.close, () async {
+          items.add(menuItem(S.l.closeEditor, Icons.close, () async {
             final workspace = router.editorFor(r.id);
             if (workspace != null && workspace.hasUnsavedChanges) {
               final ok = await requiresConfirmation(
                 context,
-                message: 'Close the editor on $title?',
-                informative: 'Unsaved changes are lost.',
-                confirmTitle: 'Discard Changes and Close',
+                message: S.l.closeEditorOn(title),
+                informative: S.l.unsavedChangesLost,
+                confirmTitle: S.l.discardAndClose,
                 destructive: true,
                 always: true,
               );
@@ -272,18 +267,18 @@ class _OwnerRow extends StatelessWidget {
             router.closeRoute(r);
           }));
         case ServerTool.monitor:
-          items.add(menuItem('Close Monitor', Icons.close, () => router.closeRoute(r)));
+          items.add(menuItem(S.l.closeMonitor, Icons.close, () => router.closeRoute(r)));
       }
     }
     if (routes.length > 1) {
       items.add(const PopupMenuDivider());
-      items.add(menuItem('Close All', Icons.clear_all, () async {
+      items.add(menuItem(S.l.closeAll, Icons.clear_all, () async {
         final unsaved = routes.any((r) => r.tool == ServerTool.editor && (router.editorFor(r.id)?.hasUnsavedChanges ?? false));
         final ok = await requiresConfirmation(
           context,
-          message: 'Close everything open on $title?',
-          informative: unsaved ? 'Unsaved changes in the editor will be lost.' : null,
-          confirmTitle: unsaved ? 'Discard Changes and Close' : 'Close All',
+          message: S.l.closeEverythingOn(title),
+          informative: unsaved ? S.l.unsavedInEditor : null,
+          confirmTitle: unsaved ? S.l.discardAndClose : S.l.closeAll,
           destructive: true,
           always: unsaved,
         );
@@ -298,8 +293,8 @@ Future<void> closeTerminalAsking(BuildContext context, TerminalSession session) 
   if (!session.closed) {
     final ok = await requiresConfirmation(
       context,
-      message: 'Close the session on ${session.displayName}?',
-      confirmTitle: 'Close Session',
+      message: S.l.closeSessionOn(session.displayName),
+      confirmTitle: S.l.closeSession,
       destructive: true,
     );
     if (!ok) return;
